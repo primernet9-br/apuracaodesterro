@@ -181,7 +181,7 @@ function atualizarDadosSecao(){
 }
 $("secao").addEventListener("change",atualizarDadosSecao);
 atualizarDadosSecao();
-if(secaoUrl){
+if(typeof secaoUrl!=="undefined" && secaoUrl){
  const opt=[...$("secao").options].find(o=>o.value===secaoUrl.replace(/^0+/,""));
  if(opt){ $("secao").value=opt.value; atualizarDadosSecao(); }
 }
@@ -492,13 +492,12 @@ $("tabManual").onclick=()=>{
 
 $("start").onclick=startCamera;
 $("stop").onclick=stopCamera;
-$("clear").onclick=clearAll;
-$("fileInput").onchange=async e=>{
+$("fileInput").addEventListener("change",async e=>{
  const file=e.target.files && e.target.files[0];
  if(!file)return;
+ diag("Arquivo selecionado: "+file.name);
  await scanPhoto(file);
- e.target.value="";
-};
+});
 
 
 updateBalance();
