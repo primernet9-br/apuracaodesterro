@@ -181,7 +181,7 @@ function atualizarDadosSecao(){
 }
 $("secao").addEventListener("change",atualizarDadosSecao);
 atualizarDadosSecao();
-if(secaoUrl){
+if(typeof secaoUrl!=="undefined" && secaoUrl){
  const opt=[...$("secao").options].find(o=>o.value===secaoUrl.replace(/^0+/,""));
  if(opt){ $("secao").value=opt.value; atualizarDadosSecao(); }
 }
@@ -237,86 +237,212 @@ function updateBalance(){
 }
 ["apto","comp","falt"].forEach(id=>$(id).addEventListener("input",updateBalance));
 
+function normalizeQRText(text){
+ return String(text||"").replace(/\|/g," ").replace(/[\r\n]+/g," ").replace(/\s+/g," ").trim();
+}
+
 function parseFields(text){
  const out={};
- const re=/([A-Z][A-Z0-9]*):([^\s]+)/g; let m;
- while((m=re.exec(text)))out[m[1]]=m[2];
+ const re=/(?:^|\s)([A-Z][A-Z0-9]*):([^\s]+)/g; let m;
+ while((m=re.exec(normalizeQRText(text)))) out[m[1]]=m[2];
  return out;
 }
 
 function cargoNome(v){
  const map={
-  "1":"DEPUTADO FEDERAL","2":"DEPUTADO ESTADUAL",
-  "3":"SENADOR","4":"GOVERNADOR","5":"PRESIDENTE"
+  "1":"PRESIDENTE",
+  "3":"GOVERNADOR",
+  "5":"SENADOR",
+  "6":"DEPUTADO FEDERAL",
+  "7":"DEPUTADO ESTADUAL",
+  "8":"DEPUTADO DISTRITAL",
+  "11":"PREFEITO",
+  "13":"VEREADOR",
+  "25":"CONSELHEIRO DISTRITAL"
  };
- return map[String(v)]||String(v||"");
+ return map[String(v)]||"CARG "+String(v||"");
 }
 
 function onScan(text){
- diag("Texto QR recebido: "+text.slice(0,500));
- const m=text.match(/^QRBU:(\d+):(\d+)/);
- if(!m){msg("QR detectado, mas não reconhecido como QRBU.","err");return}
+ diag("Texto QR recebido: "+String(text).slice(0,700));
+ const normalized=normalizeQRText(text);
+ const m=normalized.match(/^QRBU:(\d+):(\d+)/);
+ if(!m){msg("QR detectado, mas não reconhecido como QRBU do padrão TSE 2026.","err");return}
  const idx=Number(m[1]),total=Number(m[2]);
- parts[idx]=text; msg("QR "+idx+" de "+total+" lido.","ok");
+ parts[idx]=normalized;
+ msg("QR "+idx+" de "+total+" lido.","ok");
  if(Object.keys(parts).length===total){
    const codes=Object.keys(parts).sort((a,b)=>Number(a)-Number(b)).map(k=>parts[k]);
-   try{parsed=parseQRs(codes);fillFromParsed(parsed);stopCamera();msg("Todos os QR Codes foram lidos. Confira os dados.","ok")}
+   try{parsed=parseQRs(codes);fillFromParsed(parsed);stopCamera();msg("Todos os QR Codes foram lidos. Confira os dados antes de enviar.","ok")}
    catch(e){msg(e.message||String(e),"err");diag("Erro de validação: "+(e.message||e))}
  }
 }
 
 function parseQRs(codes){
- const first=codes[0].match(/^QRBU:(\d+):(\d+)/);
- if(!first)throw Error("QR inválido.");
+ if(!codes||!codes.length)throw Error("Nenhum QR foi recebido.");
+ const first=normalizeQRText(codes[0]).match(/^QRBU:(\d+):(\d+)/);
+ if(!first)throw Error("QR inválido: marcador QRBU não encontrado.");
  const total=Number(first[2]);
  if(codes.length!==total)throw Error("Faltam QR Codes. Esperados "+total+".");
- let content="";
- for(let i=0;i<codes.length;i++){
-   const h=codes[i].match(/^QRBU:(\d+):(\d+)/);
-   if(!h||Number(h[1])!==i+1||Number(h[2])!==total)throw Error("QR Codes fora de ordem.");
-   content+=(i?" ":"")+codes[i].replace(/^QRBU:\d+:\d+\s*/,"").trim();
+
+ // Cada QR traz seu índice. A ordem é reconstruída pelo índice antes da análise.
+ const ordered=codes.map(normalizeQRText).map(text=>{
+   const m=text.match(/^QRBU:(\d+):(\d+)/);
+   if(!m)throw Error("Um dos QR Codes não possui QRBU:n:x.");
+   return {n:Number(m[1]),total:Number(m[2]),text};
+ }).sort((a,b)=>a.n-b.n);
+ for(let i=0;i<ordered.length;i++){
+   if(ordered[i].total!==total)throw Error("QR Codes pertencem a sequências diferentes.");
+   if(ordered[i].n!==i+1)throw Error("Falta o QR "+(i+1)+" ou há QR duplicado.");
  }
- const f=parseFields(content);
- const p={
-  zona:f.ZONA||"",secao:f.SECA||"",municipio:f.MUNI||"",idue:f.IDUE||"",
-  apto:Number(f.APTO||0),comparecimento:Number(f.COMP||0),faltosos:Number(f.FALT||0),
-  qtdQr:total,rawQr:codes.join("\n"),votos:[]
- };
- if(p.secao&&secaoUrl&&p.secao.padStart(3,"0")!==secaoUrl)throw Error("QR indica seção "+p.secao+"; este link é da seção "+secaoUrl+".");
- if(p.apto&&p.apto!==p.comparecimento+p.faltosos)throw Error("Aptos não fecham com comparecimento + faltosos.");
- let cargo=null;
- content.split(/\s+/).forEach(tok=>{
-   const kv=tok.match(/^([A-Z][A-Z0-9]*):(.+)$/);
-   if(kv){
-     const k=kv[1],v=kv[2];
-     if(k==="CARG")cargo={cargo:cargoNome(v),tipo:"CANDIDATO"};
-     else if(k==="TIPO"&&cargo)cargo.tipo=v;
-     return;
-   }
-   const cv=tok.match(/^(\d{1,6}):(\d+)$/);
-   if(cv&&cargo)p.votos.push({cargo:cargo.cargo,tipo:cargo.tipo||"CANDIDATO",numero:cv[1],candidato:"",votos:Number(cv[2])});
+
+ // Para a leitura normal, cada QR termina em um limite de registro.
+ // Quando houver quebra entre QRs, o separador lógico é restaurado.
+ let content="";
+ ordered.forEach((q,i)=>{
+   const body=q.text.replace(/^QRBU:\d+:\d+\s*/i,"");
+   content += (i?" ":"")+body.trim();
  });
+ content=normalizeQRText(content);
+
+ const tokens=content.split(" ").filter(Boolean);
+ const p={
+   zona:"",secao:"",municipio:"",idue:"",apto:0,comparecimento:0,faltosos:0,
+   validos:0,brancos:0,nulos:0,qtdQr:total,rawQr:ordered.map(q=>q.text).join("\n"),votos:[],cargos:[],resumos:[]
+ };
+ let cargo=null, tipo=null, partido=null;
+ let lastSection="";
+
+ const knownKeys=new Set(["VRQR","ORIG","ORLC","PROC","DTPL","PLEI","TURN","FASE","UNFE","MUNI","ZONA","SECA","AGRE","IDUE","IDCA","HIQT","HICA","VERS","LOCA","APTO","APTS","APTT","COMP","FALT","IDEL","CARG","TIPO","VERC","PART","LEGP","TOTP","APTA","NOMI","LEGC","BRAN","NULO","TOTC","HASH","ASSI"]);
+
+ function addVote(numero,votos){
+   if(!cargo)return;
+   const item={cargo:cargo.nome,codigoCargo:cargo.codigo,tipo:tipo===1?"CANDIDATO":"CANDIDATO",numero:String(numero),candidato:"",votos:Number(votos),partido:partido?String(partido.numero):""};
+   // Em cargo proporcional, LEGP é a votação da legenda e TOTP é o total do partido.
+   // O registro PART em si não é voto nominal.
+   p.votos.push(item);
+   if(partido) partido.votos.push(item);
+ }
+
+ for(const tok of tokens){
+   const i=tok.indexOf(":");
+   if(i<=0)continue;
+   const k=tok.slice(0,i),v=tok.slice(i+1);
+
+   if(k==="VRQR"){p.vrqr=v;continue;}
+   if(k==="ZONA"){p.zona=v;continue;}
+   if(k==="SECA"){p.secao=v;continue;}
+   if(k==="MUNI"){p.municipio=v;continue;}
+   if(k==="IDUE"){p.idue=v;continue;}
+   if(k==="APTO"||k==="APTA"){p.apto=Number(v)||0;continue;}
+   if(k==="COMP"){p.comparecimento=Number(v)||0;continue;}
+   if(k==="FALT"){p.faltosos=Number(v)||0;continue;}
+
+   if(k==="CARG"){
+     const codigo=Number(v);
+     cargo={codigo,nome:cargoNome(codigo),tipo:null,partidos:[],resumo:{}};
+     p.cargos.push(cargo);
+     tipo=null; partido=null; lastSection="CARG";
+     continue;
+   }
+   if(k==="TIPO"){tipo=Number(v);if(cargo)cargo.tipo=tipo;continue;}
+   if(k==="PART"){
+     partido={numero:String(v),legenda:0,total:0,votos:[]};
+     if(cargo)cargo.partidos.push(partido);
+     continue;
+   }
+   if(k==="LEGP"){
+     if(partido){partido.legenda=Number(v)||0;if(partido.legenda>0)p.votos.push({cargo:cargo?cargo.nome:"",codigoCargo:cargo?cargo.codigo:0,tipo:"LEGENDA",numero:partido.numero,candidato:"LEGENDA",votos:partido.legenda,partido:partido.numero});}
+     continue;
+   }
+   if(k==="TOTP"){if(partido)partido.total=Number(v)||0;continue;}
+
+   if(["APTA","NOMI","LEGC","BRAN","NULO","TOTC"].includes(k)){
+     const n=Number(v)||0;
+     if(cargo)cargo.resumo[k]=n;
+     if(k==="BRAN")p.brancos+=n;
+     if(k==="NULO")p.nulos+=n;
+     continue;
+   }
+
+   if(/^\d+$/.test(k) && /^\d+$/.test(v) && cargo){
+     addVote(k,v);
+     continue;
+   }
+   if(knownKeys.has(k))continue;
+ }
+
+ // O TSE repete APTO/COMP/FALT nos blocos; são valores gerais da seção.
+ if(p.apto && p.apto!==p.comparecimento+p.faltosos){
+   throw Error("Aptos ("+p.apto+") não fecham com Comparecimento ("+p.comparecimento+") + Faltosos ("+p.faltosos+").");
+ }
+ if(p.secao&&secaoUrl&&p.secao.padStart(3,"0")!==secaoUrl){
+   throw Error("QR indica seção "+p.secao+"; este link é da seção "+secaoUrl+".");
+ }
+
+ // Válidos: soma dos votos nominais + legendas encontrados no QR.
+ p.validos=p.votos.reduce((s,v)=>s+Number(v.votos||0),0);
+
+ for(const v of p.votos){
+   if(v.tipo==="LEGENDA")continue;
+   const mapa=CANDIDATOS[v.cargo]||{};
+   v.candidato=mapa[v.numero]||"OUTRO CANDIDATO";
+ }
  return p;
 }
 
 function fillFromParsed(p){
- $("secao").value=p.secao||$("secao").value;
+ const opt=[...$("secao").options].find(o=>o.value===String(p.secao));
+ if(opt){$("secao").value=String(p.secao);}else{$("secao").value=p.secao||$("secao").value;}
  $("idue").value=p.idue||"";
  $("zona").value=p.zona||"";
  $("municipio").value=p.municipio||"";
  $("apto").value=p.apto||"";
  $("comp").value=p.comparecimento||"";
  $("falt").value=p.faltosos||"";
+ $("validos").value=p.validos||"";
+ $("brancos").value=p.brancos||"";
+ $("nulos").value=p.nulos||"";
  updateBalance();
- if(p.votos.length){
-   p.votos.forEach(v=>{
-     let found=document.querySelector(".vote-input[data-cargo='"+CSS.escape(v.cargo)+"'][data-numero='"+CSS.escape(v.numero)+"']");
-     if(found)found.value=v.votos;
-   });
- }
- $("qrData").innerHTML="<div><b>Seção:</b> "+esc(p.secao)+" &nbsp; <b>IDUE:</b> "+esc(p.idue)+" &nbsp; <b>QR:</b> "+p.qtdQr+"</div>";
+
+ // Limpa somente os campos de votos antes de preencher o QR.
+ document.querySelectorAll(".vote-input").forEach(i=>i.value="");
+ document.querySelectorAll(".otherRows").forEach(i=>i.innerHTML="");
+
+ const grouped={};
+ p.votos.forEach(v=>{
+   if(v.tipo==="LEGENDA")return;
+   const key=v.cargo+"|"+v.numero;
+   if(!grouped[key])grouped[key]={...v}; else grouped[key].votos+=v.votos;
+ });
+ Object.values(grouped).forEach(v=>{
+   const found=[...document.querySelectorAll(".vote-input")].find(i=>i.dataset.cargo===v.cargo && i.dataset.numero===v.numero);
+   if(found){found.value=v.votos;return;}
+   const box=[...document.querySelectorAll(".other")].find(x=>x.dataset.cargo===v.cargo);
+   if(box){
+     const r=document.createElement("div");r.className="row otherRow";
+     r.innerHTML="<input class='other-numero' type='text' inputmode='numeric' placeholder='Número'><input class='other-nome' type='text' placeholder='Nome do candidato'><input class='other-votos' type='number' min='0' placeholder='0'>";
+     r.querySelector(".other-numero").value=v.numero;
+     r.querySelector(".other-nome").value=v.candidato||"OUTRO CANDIDATO";
+     r.querySelector(".other-votos").value=v.votos;
+     box.querySelector(".otherRows").appendChild(r);
+   }
+ });
+
+ let resumoCargo=p.cargos.map(c=>{
+   const r=c.resumo||{};
+   return "<div style='margin-top:8px'><b>"+esc(c.nome)+"</b>: "+
+     "Brancos "+(r.BRAN??0)+" · Nulos "+(r.NULO??0)+" · Total " +(r.TOTC??0)+"</div>";
+ }).join("");
+ $("qrData").innerHTML="<div><b>Seção:</b> "+esc(p.secao)+" &nbsp; <b>IDUE:</b> "+esc(p.idue)+" &nbsp; <b>Zona:</b> "+esc(p.zona)+" &nbsp; <b>QR:</b> "+p.qtdQr+"</div>"+
+   "<div style='margin-top:8px'><b>Votos interpretados:</b> "+p.votos.length+"</div>"+resumoCargo;
  $("qrDataCard").classList.remove("hidden");
  $("origem").value="QR";
+ // Depois da leitura, muda para a tela manual para conferência, sem alterar seu layout.
+ $("qrScreen").classList.add("hidden");
+ $("manualScreen").classList.remove("hidden");
+ $("tabQr").className="secondary";
+ $("tabManual").className="primary";
 }
 
 async function startCamera(){
@@ -356,22 +482,63 @@ function canvasVariants(img){
 
 async function scanPhoto(file){
  if(!file)return;
- if(!jsQRReady||!window.jsQR){msg("Leitor de foto ainda está carregando.","err");return}
- const url=URL.createObjectURL(file),img=new Image();
- img.onload=async()=>{
-  $("preview").src=url;$("preview").style.display="block";
-  try{
-   for(const v of canvasVariants(img)){
-    const ctx=v.canvas.getContext("2d",{willReadFrequently:true});
-    const data=ctx.getImageData(0,0,v.canvas.width,v.canvas.height);
-    const code=window.jsQR(data.data,data.width,data.height,{inversionAttempts:"attemptBoth"});
-    if(code&&code.data){msg("QR encontrado. Conferindo dados…","ok");onScan(code.data);URL.revokeObjectURL(url);return}
+ msg("Processando a foto do QR Code…","info");
+ diag("Abrindo foto: "+file.name);
+
+ // Primeiro usa o leitor html5-qrcode, que possui suporte próprio para
+ // arquivos de imagem e costuma funcionar melhor que decodificar o canvas manualmente.
+ if(qrReady && window.Html5Qrcode){
+   try{
+     if(scanner){await stopCamera();}
+     scanner=new Html5Qrcode("reader");
+     const text=await scanner.scanFile(file,true);
+     diag("QR encontrado na foto.");
+     onScan(text);
+     try{await scanner.clear();}catch(e){}
+     scanner=null;
+     return;
+   }catch(e){
+     try{if(scanner){await scanner.clear();}}catch(_){}
+     scanner=null;
+     diag("html5-qrcode não decodificou; tentando leitor alternativo.");
    }
-   msg("A foto foi aberta, mas o QR não foi decodificado. Tente uma foto mais próxima e sem reflexos.","err");
-  }catch(e){msg("Erro ao processar a foto: "+e,"err")}
- };
- img.onerror=()=>msg("Não consegui abrir a foto selecionada.","err");
- img.src=url;
+ }
+
+ // Fallback com jsQR.
+ if(jsQRReady && window.jsQR){
+   const reader=new FileReader();
+   reader.onload=()=>{
+     const img=new Image();
+     img.onload=()=>{
+       try{
+         $("preview").src=reader.result;
+         $("preview").style.display="block";
+         const variants=canvasVariants(img);
+         for(const v of variants){
+           const ctx=v.canvas.getContext("2d",{willReadFrequently:true});
+           const data=ctx.getImageData(0,0,v.canvas.width,v.canvas.height);
+           const code=window.jsQR(data.data,data.width,data.height,{inversionAttempts:"attemptBoth"});
+           if(code&&code.data){
+             diag("QR encontrado pelo leitor alternativo.");
+             onScan(code.data);
+             return;
+           }
+         }
+         msg("A foto foi aberta, mas o QR não foi decodificado. Tente uma foto mais próxima e sem reflexos.","err");
+       }catch(e){
+         msg("Erro ao processar a foto: "+(e.message||e),"err");
+         diag("Erro ao processar foto: "+(e.stack||e));
+       }
+     };
+     img.onerror=()=>msg("Não consegui abrir a foto selecionada.","err");
+     img.src=reader.result;
+   };
+   reader.onerror=()=>msg("Não consegui ler o arquivo de imagem.","err");
+   reader.readAsDataURL(file);
+   return;
+ }
+
+ msg("Os leitores de QR ainda estão carregando. Aguarde alguns segundos e selecione a foto novamente.","err");
 }
 
 function collectVotes(){
@@ -448,8 +615,12 @@ $("tabManual").onclick=()=>{
 
 $("start").onclick=startCamera;
 $("stop").onclick=stopCamera;
-$("clear").onclick=clearAll;
-$("fileInput").onchange=e=>{scanPhoto(e.target.files[0]);e.target.value=""};
+$("fileInput").addEventListener("change",async e=>{
+ const file=e.target.files && e.target.files[0];
+ if(!file)return;
+ diag("Arquivo selecionado: "+file.name);
+ await scanPhoto(file);
+});
 
 
 updateBalance();
