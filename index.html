@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Apuração Desterro/PB — Leitor BU</title>
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#111827;background:#f4f7fb}
+body{margin:0;background:#f4f7fb}.wrap{max-width:760px;margin:auto;padding:16px}
+.card{background:white;border-radius:18px;padding:18px;margin:12px 0;box-shadow:0 4px 18px #00000010}
+h1{font-size:23px;margin:0 0 5px}.sub{color:#64748b}.pill{display:inline-block;background:#eef2ff;padding:6px 10px;border-radius:999px;font-weight:700;font-size:13px;margin:8px 4px 0 0}
+button{border:0;border-radius:12px;padding:12px 15px;font-weight:800;background:#111827;color:white;margin:4px 4px 4px 0}
+button.secondary{background:#e5e7eb;color:#111827}button.ok{background:#166534}
+#reader{width:100%;max-width:520px;margin:14px auto;display:none}.msg{padding:12px;border-radius:12px;background:#fff7ed;color:#9a3412;margin-top:10px}
+.err{background:#fee2e2;color:#991b1b}.success{background:#dcfce7;color:#166534}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field label{font-size:12px;color:#64748b}.field div{font-weight:800;border:1px solid #e2e8f0;border-radius:10px;padding:10px;min-height:20px}
+input{width:100%;box-sizing:border-box;padding:12px;border:1px solid #cbd5e1;border-radius:10px;margin-top:6px}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:7px;border-bottom:1px solid #e5e7eb;text-align:left}
+.small{font-size:12px;color:#64748b}.hide{display:none}
+</style>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>Apuração Desterro/PB — 2026</h1>
+    <div class="sub">Leitor externo do Boletim de Urna</div>
+    <div><span class="pill" id="secaoPill">Seção carregando...</span><span class="pill" id="statusPill">PENDENTE</span></div>
+  </div>
+
+  <div class="card">
+    <h2>1. Ler QR Code do BU</h2>
+    <div class="sub">A câmera é aberta nesta página externa, fora do sandbox do Apps Script.</div>
+    <button id="start">Iniciar câmera</button>
+    <button class="secondary" id="stop">Parar</button>
+    <button class="secondary" id="clear">Limpar</button>
+    <div id="reader"></div>
+    <div id="msg" class="msg hide"></div>
+  </div>
+
+  <div class="card">
+    <h2>2. Conferir dados</h2>
+    <div class="grid">
+      <div class="field"><label>Zona</label><div id="zona">—</div></div>
+      <div class="field"><label>Seção</label><div id="secao">—</div></div>
+      <div class="field"><label>Município</label><div id="muni">—</div></div>
+      <div class="field"><label>Urna (IDUE)</label><div id="idue">—</div></div>
+      <div class="field"><label>Eleitores aptos</label><div id="apto">—</div></div>
+      <div class="field"><label>Comparecimento</label><div id="comp">—</div></div>
+      <div class="field"><label>Faltosos</label><div id="falt">—</div></div>
+      <div class="field"><label>Quantidade de QR</label><div id="qtdqr">—</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>3. Votos encontrados</h2>
+    <div id="votes">Nenhum QR lido ainda.</div>
+  </div>
+
+  <div class="card">
+    <h2>4. Enviar lançamento</h2>
+    <label>Responsável
+      <input id="responsavel" placeholder="Nome/identificação">
+    </label>
+    <br>
+    <label>Observação
+      <input id="obs" placeholder="Opcional">
+    </label>
+    <button class="ok" id="send">Enviar para conferência</button>
+    <div class="small">O envio grava o lançamento no backend. A publicação no painel deve ocorrer somente após conferência.</div>
+  </div>
+
+  <div class="card">
+    <h3>Conferência</h3>
+    <div class="sub">O leitor é uma ferramenta independente. O TSE disponibiliza o aplicativo oficial Boletim na Mão para leitura do QR Code. Confira o BU impresso e/ou a conferência oficial antes de considerar um lançamento confirmado.</div>
+  </div>
+</div>
+
+<script>
+const BACKEND = "%%BACKEND_URL%%";
+const params = new URLSearchParams(location.search);
+const secaoUrl = (params.get("secao")||"").padStart(3,"0");
+document.getElementById("secaoPill").textContent = "Seção " + (secaoUrl||"—");
+
+let scanner=null;
+let parts={};
+let parsed=null;
+
+function msg(t,kind=""){const el=document.getElementById("msg");el.textContent=t;el.className="msg "+kind;el.classList.remove("hide")}
+function clearMsg(){document.getElementById("msg").classList.add("hide")}
+
+function parseFields(text){
+  const out={};
+  const re=/([A-Z][A-Z0-9]*):([A-Za-z0-9._-]+)/g; let m;
+  while((m=re.exec(text))) out[m[1]]=m[2];
+  return out;
+}
+
+function onScan(text){
+  const m=text.match(/^QRBU:(\d+):(\d+)/);
+  if(!m){msg("QR detectado, mas não parece ser um QRBU do Boletim de Urna.","err");return}
+  const idx=Number(m[1]), total=Number(m[2]);
+  parts[idx]=text;
+  msg(`QR ${idx} de ${total} lido. ${Object.keys(parts).length}/${total}`);
+  if(Object.keys(parts).length===total){
+    for(let i=1;i<=total;i++) if(!parts[i]){msg("Falta o QR "+i+". Leia todos na ordem.","err");return}
+    try{
+      parsed=parseQRs(Object.values(parts).sort((a,b)=>Number(a.match(/^QRBU:(\d+):/)[1])-Number(b.match(/^QRBU:(\d+):/)[1]));
+      render(parsed);
+      stopCamera();
+      msg("Todos os QR Codes foram lidos. Confira os dados antes de enviar.","success");
+    }catch(e){msg(e.message||String(e),"err")}
+  }
+}
+
+function parseQRs(codes){
+  const first=parseFields(codes[0]);
+  const m=codes[0].match(/^QRBU:(\d+):(\d+)/);
+  const total=Number(m[2]);
+  if(codes.length!==total) throw new Error(`Esperados ${total} QR Codes; lidos ${codes.length}.`);
+  let content="";
+  for(let i=0;i<codes.length;i++){
+    const h=codes[i].match(/^QRBU:(\d+):(\d+)/);
+    if(!h || Number(h[1])!==i+1 || Number(h[2])!==total) throw new Error("QR Codes fora de ordem.");
+    let t=codes[i].replace(/^QRBU:\d+:\d+\s*/,"");
+    t=t.replace(/\sHASH:[A-F0-9]+(?:\sASSI:[A-F0-9]+)?\s*$/,"");
+    content += (i?" ":"")+t.trim();
+  }
+  const f=parseFields(content);
+  const p={
+    zona:f.ZONA||"",secao:f.SECA||"",municipio:f.MUNI||"",idue:f.IDUE||"",
+    apto:Number(f.APTO||0),comparecimento:Number(f.COMP||0),faltosos:Number(f.FALT||0),
+    qtdQr:total,rawQr:codes.join("\n"),votos:[],cargos:[]
+  };
+  if(p.secao && secaoUrl && p.secao.padStart(3,"0")!==secaoUrl)
+    throw new Error(`O QR indica seção ${p.secao}, mas este link é da seção ${secaoUrl}.`);
+  if(p.apto !== p.comparecimento+p.faltosos)
+    throw new Error(`Divergência aritmética: aptos ${p.apto} ≠ comparecimento ${p.comparecimento} + faltosos ${p.faltosos}.`);
+
+  // Reconstrói cargos. O QR oficial usa CARG/IDEL/TIPO e pares numéricos codigo:votos.
+  const toks=content.split(/\s+/);
+  const control=new Set(["CARG","TIPO","VERC","PART","LEGP","TOTP","APTA","APTS","APTT","NOMI","LEGC","BRAN","NULO","TOTC","IDEL","VRQR","ORIG","ORLC","PROC","DTPL","PLEI","TURN","FASE","UNFE","MUNI","ZONA","SECA","AGRE","IDUE","IDCA","HIQT","HICA","VERS","LOCA","APTO","COMP","FALT","HBBM","HBBG","HBSB","DTAB","HRAB","DTFC","HRFC","DTEM","HREM","MAJO","PROP","HASH","ASSI","QRBU"]);
+  let cargo=null, currentElection="";
+  for(const tok of toks){
+    let kv=tok.match(/^([A-Z][A-Z0-9]*):(.+)$/);
+    if(kv){
+      const k=kv[1],v=kv[2];
+      if(k==="IDEL") currentElection=v;
+      if(k==="CARG"){cargo={idEleicao:currentElection,cargo:v,tipo:"",nomi:0,legc:0,bran:0,nulo:0,totc:null};p.cargos.push(cargo)}
+      else if(k==="TIPO"&&cargo)cargo.tipo=v;
+      else if(k==="NOMI"&&cargo)cargo.nomi=Number(v);
+      else if(k==="LEGC"&&cargo)cargo.legc=Number(v);
+      else if(k==="BRAN"&&cargo)cargo.bran=Number(v);
+      else if(k==="NULO"&&cargo)cargo.nulo=Number(v);
+      else if(k==="TOTC"&&cargo)cargo.totc=Number(v);
+      continue;
+    }
+    const cv=tok.match(/^(\d{1,6}):(\d+)$/);
+    if(cv && cargo && !control.has(cv[1]))
+      p.votos.push({idEleicao:cargo.idEleicao,cargo:cargo.cargo,tipo:cargo.tipo,codigo:cv[1],votos:Number(cv[2])});
+  }
+  for(const c of p.cargos){
+    if(c.totc!==null && c.nomi+c.legc+c.bran+c.nulo!==c.totc)
+      throw new Error(`Divergência no cargo ${c.cargo}: soma dos votos diferente de TOTC.`);
+  }
+  return p;
+}
+
+function render(p){
+  parsed=p;
+  [["zona",p.zona],["secao",p.secao],["muni",p.municipio],["idue",p.idue],["apto",p.apto],["comp",p.comparecimento],["falt",p.faltosos],["qtdqr",p.qtdQr]].forEach(([id,v])=>document.getElementById(id).textContent=v||"0");
+  if(!p.votos.length){document.getElementById("votes").textContent="Nenhum voto nominal/legenda identificado no QR.";return}
+  let h="<table><tr><th>Eleição</th><th>Cargo</th><th>Código</th><th>Votos</th></tr>";
+  p.votos.forEach(v=>h+=`<tr><td>${esc(v.idEleicao)}</td><td>${esc(v.cargo)}</td><td>${esc(v.codigo)}</td><td>${v.votos}</td></tr>`);
+  h+="</table>";document.getElementById("votes").innerHTML=h;
+}
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+async function startCamera(){
+  clearMsg();
+  document.getElementById("reader").style.display="block";
+  if(!window.isSecureContext){msg("A câmera exige HTTPS. Publique o leitor em uma URL HTTPS.","err");return}
+  try{
+    scanner=new Html5Qrcode("reader");
+    const config={fps:10,qrbox:{width:260,height:260},aspectRatio:1.0};
+    await scanner.start({facingMode:"environment"},config,onScan,()=>{});
+  }catch(e){
+    msg("Não foi possível abrir a câmera. Verifique se o site está em HTTPS e se o navegador autorizou a câmera. "+(e.message||e),"err");
+  }
+}
+async function stopCamera(){
+  if(scanner){try{await scanner.stop()}catch(e){}try{await scanner.clear()}catch(e){}scanner=null}
+  document.getElementById("reader").style.display="none";
+}
+function clearAll(){
+  parts={};parsed=null;stopCamera();clearMsg();
+  document.getElementById("votes").textContent="Nenhum QR lido ainda.";
+  ["zona","muni","idue","apto","comp","falt","qtdqr"].forEach(id=>document.getElementById(id).textContent="—");
+  document.getElementById("secao").textContent=secaoUrl||"—";
+}
+document.getElementById("start").onclick=startCamera;
+document.getElementById("stop").onclick=stopCamera;
+document.getElementById("clear").onclick=clearAll;
+
+document.getElementById("send").onclick=()=>{
+  if(!parsed){msg("Leia o QR Code antes de enviar.","err");return}
+  if(!BACKEND || BACKEND.includes("%%")){msg("O backend ainda não foi configurado neste leitor.","err");return}
+  const payload={...parsed,responsavel:document.getElementById("responsavel").value,observacao:document.getElementById("obs").value};
+  // POST cross-origin por formulário: não depende de CORS.
+  const form=document.createElement("form");
+  form.method="POST";form.action=BACKEND;form.target="submitFrame";form.style.display="none";
+  const input=document.createElement("input");input.name="payload";input.value=JSON.stringify(payload);form.appendChild(input);
+  document.body.appendChild(form);form.submit();form.remove();
+  document.getElementById("statusPill").textContent="ENVIADO";
+  msg("Lançamento enviado para conferência. Aguarde a confirmação do responsável pelo painel interno.","success");
+};
+</script>
+<iframe name="submitFrame" style="display:none"></iframe>
+</body>
+</html>
