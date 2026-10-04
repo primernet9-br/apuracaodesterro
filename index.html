@@ -158,7 +158,6 @@ function diag(t){$("diag").textContent=new Date().toLocaleTimeString()+" — "+t
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 
 $("secao").value=secaoUrl||"";
-$("secaoPill").textContent="Seção "+(secaoUrl||"—");
 
 function loadScript(src,name,cb){
  const s=document.createElement("script");s.src=src;s.async=true;
@@ -415,7 +414,6 @@ $("tabManual").onclick=()=>{
 $("start").onclick=startCamera;
 $("stop").onclick=stopCamera;
 $("clear").onclick=clearAll;
-$("fileBtn").onclick=()=>$("fileInput").click();
 $("fileInput").onchange=e=>{scanPhoto(e.target.files[0]);e.target.value=""};
 
 
