@@ -25,7 +25,7 @@ body{margin:0;background:#f4f7fb;color:#111827;font-family:-apple-system,BlinkMa
 <script>
 (function(){
 "use strict";
-var BACKEND="%%BACKEND_URL%%";
+var BACKEND="https://script.google.com/macros/s/AKfycbwmaw96kv-LeWk3znO_F4B2Wky8PXxYcFvXYmwLN3R2TZEnv1SYeP1WmXxJmvaMFhM/exec";
 var params=new URLSearchParams(location.search),secaoUrl=(params.get("secao")||"").padStart(3,"0");
 var scanner=null,parts={},parsed=null,qrReady=false,jsQRReady=false;
 function $(id){return document.getElementById(id)}
