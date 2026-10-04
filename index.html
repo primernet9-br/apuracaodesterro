@@ -36,78 +36,83 @@ button{border:0;border-radius:10px;padding:12px 15px;font-weight:700;cursor:poin
 <body>
 <div class="wrap">
 <header>
-  <h1>Apuração Desterro/PB 2026</h1>
-  <div class="sub">Recebimento de BU — leitura por QR ou lançamento manual</div>
+  <h1>APURAÇÃO DESTERRO 2026</h1>
+  <div class="sub">Sistema de recebimento e lançamento de Boletins de Urna</div>
 </header>
 
-<div class="card">
-  <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
-    <h2 style="margin:0">1. Seção</h2>
-    <span id="secaoPill" class="status">Seção —</span>
-  </div>
-  <div class="grid">
-    <label>Seção<input id="secao" placeholder="Ex.: 506"></label>
-    <label>IDUE<input id="idue" placeholder="Ex.: 1022116"></label>
-    <label>Zona<input id="zona" placeholder="Ex.: 30"></label>
-    <label>Município<input id="municipio" placeholder="DESTERRO"></label>
-  </div>
+<div style="display:flex;gap:6px;margin-bottom:12px">
+  <button id="tabQr" class="primary" style="flex:1">📷 Ler QR Code</button>
+  <button id="tabManual" class="secondary" style="flex:1">✍️ Lançamento Manual</button>
 </div>
 
-<div class="card">
-  <h2>2. Leitura do BU</h2>
-  <div style="display:flex;gap:8px;flex-wrap:wrap">
-    <button id="start" class="primary">Iniciar câmera</button>
-    <button id="stop" class="secondary">Parar câmera</button>
-    <button id="fileBtn" class="secondary">Ler foto</button>
-    <button id="manualBtn" class="secondary">Lançamento Manual</button>
-    <button id="clear" class="danger">Limpar</button>
-  </div>
-  <input id="fileInput" type="file" accept="image/*" class="hidden">
-  <div id="reader"></div>
-  <img id="preview" class="preview">
-  <div id="msg" class="msg"></div>
-  <div id="diag" style="font-size:12px;color:#6b7280;margin-top:8px"></div>
-</div>
+<div id="qrScreen">
+  <div class="card">
+    <h2>📷 Receber Boletim de Urna por QR Code</h2>
+    <div id="reader" style="width:100%;max-width:none;height:120px;background:#111827;border-radius:10px;margin:10px 0"></div>
 
-<div id="manualCard" class="card">
-  <h2>3. Dados da seção</h2>
-  <div class="grid3">
-    <label>Aptos<input id="apto" type="number" min="0"></label>
-    <label>Comparecimento<input id="comp" type="number" min="0"></label>
-    <label>Faltosos<input id="falt" type="number" min="0"></label>
-    <label>Válidos<input id="validos" type="number" min="0"></label>
-    <label>Brancos<input id="brancos" type="number" min="0"></label>
-    <label>Nulos<input id="nulos" type="number" min="0"></label>
-  </div>
-  <div id="balance" class="vote-summary">Aptos = Comparecimento + Faltosos</div>
-</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button id="start" class="primary" style="flex:1">📷 Iniciar câmera</button>
+      <button id="stop" class="secondary" style="flex:1">⏹️ Parar câmera</button>
+    </div>
 
-<div id="manualVotes" class="card">
-  <h2>4. Votos</h2>
-  <div id="candidateSections"></div>
-  <div class="vote-summary">Brancos e nulos são informados somente nos campos gerais acima. Não é necessário lançá-los novamente por cargo.</div>
-</div>
-
-<div class="card">
-  <h2>5. Identificação do lançamento</h2>
-  <div class="grid">
-    <label>Origem
-      <select id="origem">
-        <option value="MANUAL">MANUAL</option>
-        <option value="QR">QR</option>
-      </select>
+    <label style="margin-top:8px">Ou selecione uma foto do QR Code
+      <input id="fileInput" type="file" accept="image/*">
     </label>
-    <label>Responsável<input id="responsavel" placeholder="Nome do responsável"></label>
+
+    <img id="preview" class="preview">
+    <div id="msg" class="msg"></div>
+    <div id="diag" style="font-size:12px;color:#6b7280;margin-top:8px">Aguardando leitura do QR Code.</div>
   </div>
-  <label style="margin-top:10px">Observação<textarea id="obs" placeholder="Observações, se necessário"></textarea></label>
-  <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-    <button id="send" class="success">Enviar lançamento</button>
+
+  <div id="qrDataCard" class="card hidden">
+    <h2>Dados reconhecidos pelo QR</h2>
+    <div id="qrData"></div>
   </div>
 </div>
 
-<div id="qrDataCard" class="card hidden">
-  <h2>Dados reconhecidos pelo QR</h2>
-  <div id="qrData"></div>
+<div id="manualScreen" class="hidden">
+  <div class="card">
+    <h2>1. Dados da seção</h2>
+    <div class="grid">
+      <label>Seção<input id="secao" placeholder="Ex.: 506"></label>
+      <label>IDUE<input id="idue" placeholder="Ex.: 1022116"></label>
+      <label>Zona<input id="zona" placeholder="Ex.: 30"></label>
+      <label>Município<input id="municipio" placeholder="DESTERRO"></label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2. Dados da seção</h2>
+    <div class="grid3">
+      <label>Aptos<input id="apto" type="number" min="0"></label>
+      <label>Comparecimento<input id="comp" type="number" min="0"></label>
+      <label>Faltosos<input id="falt" type="number" min="0"></label>
+      <label>Válidos<input id="validos" type="number" min="0"></label>
+      <label>Brancos<input id="brancos" type="number" min="0"></label>
+      <label>Nulos<input id="nulos" type="number" min="0"></label>
+    </div>
+    <div id="balance" class="vote-summary">Aptos = Comparecimento + Faltosos</div>
+  </div>
+
+  <div class="card">
+    <h2>3. Votos</h2>
+    <div id="candidateSections"></div>
+    <div class="vote-summary">Brancos e nulos são informados somente nos campos gerais acima.</div>
+  </div>
+
+  <div id="manualIdentification" class="card">
+    <h2>4. Identificação do lançamento</h2>
+    <div class="grid">
+      <label>Origem
+        <select id="origem"><option value="MANUAL">MANUAL</option><option value="QR">QR</option></select>
+      </label>
+      <label>Responsável<input id="responsavel" placeholder="Nome do responsável"></label>
+    </div>
+    <label style="margin-top:10px">Observação<textarea id="obs" placeholder="Observações, se necessário"></textarea></label>
+    <div style="margin-top:12px">
+      <button id="send" class="success">Enviar lançamento</button>
+    </div>
+  </div>
 </div>
 </div>
 
@@ -390,16 +395,29 @@ $("send").onclick=()=>{
  }catch(e){msg(e.message||String(e),"err")}
 };
 
+
+$("tabQr").onclick=()=>{
+  $("qrScreen").classList.remove("hidden");
+  $("manualScreen").classList.add("hidden");
+  $("tabQr").className="primary";
+  $("tabManual").className="secondary";
+  msg("Aguardando leitura do QR Code.","info");
+};
+$("tabManual").onclick=()=>{
+  $("qrScreen").classList.add("hidden");
+  $("manualScreen").classList.remove("hidden");
+  $("tabQr").className="secondary";
+  $("tabManual").className="primary";
+  $("origem").value="MANUAL";
+  $("manualScreen").scrollIntoView({behavior:"smooth"});
+};
+
 $("start").onclick=startCamera;
 $("stop").onclick=stopCamera;
 $("clear").onclick=clearAll;
 $("fileBtn").onclick=()=>$("fileInput").click();
 $("fileInput").onchange=e=>{scanPhoto(e.target.files[0]);e.target.value=""};
-$("manualBtn").onclick=()=>{
- $("origem").value="MANUAL";
- $("manualCard").scrollIntoView({behavior:"smooth"});
- msg("Modo manual selecionado. Preencha somente os campos necessários.","info");
-};
+
 
 updateBalance();
 diag("Sistema carregado.");
