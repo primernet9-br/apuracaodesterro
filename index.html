@@ -246,8 +246,11 @@ function parseFields(text){
 
 function cargoNome(v){
  const map={
-  "1":"DEPUTADO FEDERAL","2":"DEPUTADO ESTADUAL",
-  "3":"SENADOR","4":"GOVERNADOR","5":"PRESIDENTE"
+  "6":"DEPUTADO FEDERAL",
+  "7":"DEPUTADO ESTADUAL",
+  "5":"SENADOR",
+  "3":"GOVERNADOR",
+  "1":"PRESIDENTE"
  };
  return map[String(v)]||String(v||"");
 }
@@ -357,23 +360,37 @@ function canvasVariants(img){
 async function scanPhoto(file){
  if(!file)return;
  if(!jsQRReady||!window.jsQR){msg("Leitor de foto ainda está carregando.","err");return}
- const url=URL.createObjectURL(file),img=new Image();
- img.onload=async()=>{
-  $("preview").src=url;$("preview").style.display="block";
-  try{
-   for(const v of canvasVariants(img)){
-    const ctx=v.canvas.getContext("2d",{willReadFrequently:true});
-    const data=ctx.getImageData(0,0,v.canvas.width,v.canvas.height);
-    const code=window.jsQR(data.data,data.width,data.height,{inversionAttempts:"attemptBoth"});
-    if(code&&code.data){msg("QR encontrado. Conferindo dados…","ok");onScan(code.data);URL.revokeObjectURL(url);return}
+ msg("Processando a foto do QR Code…","info");
+ const reader=new FileReader();
+ reader.onload=()=>{
+  const img=new Image();
+  img.onload=()=>{
+   try{
+    $("preview").src=reader.result;
+    $("preview").style.display="block";
+    const variants=canvasVariants(img);
+    for(const v of variants){
+     const ctx=v.canvas.getContext("2d",{willReadFrequently:true});
+     const data=ctx.getImageData(0,0,v.canvas.width,v.canvas.height);
+     const code=window.jsQR(data.data,data.width,data.height,{inversionAttempts:"attemptBoth"});
+     if(code&&code.data){
+      msg("QR encontrado. Conferindo dados…","ok");
+      onScan(code.data);
+      return;
+     }
+    }
+    msg("A foto foi aberta, mas o QR não foi decodificado. Tente uma foto mais próxima e sem reflexos.","err");
+   }catch(e){
+    msg("Erro ao processar a foto: "+(e.message||e),"err");
+    diag("Erro ao processar foto: "+(e.stack||e));
    }
-   msg("A foto foi aberta, mas o QR não foi decodificado. Tente uma foto mais próxima e sem reflexos.","err");
-  }catch(e){msg("Erro ao processar a foto: "+e,"err")}
+  };
+  img.onerror=()=>msg("Não consegui abrir a foto selecionada.","err");
+  img.src=reader.result;
  };
- img.onerror=()=>msg("Não consegui abrir a foto selecionada.","err");
- img.src=url;
+ reader.onerror=()=>msg("Não consegui ler o arquivo de imagem.","err");
+ reader.readAsDataURL(file);
 }
-
 function collectVotes(){
  const votos=[];
  document.querySelectorAll(".vote-input").forEach(i=>{
