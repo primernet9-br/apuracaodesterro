@@ -1,63 +1,2516 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Apuração Desterro/PB — Leitor BU v2</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apuração Desterro 2026</title>
+
 <style>
-body{margin:0;background:#f4f7fb;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.wrap{max-width:760px;margin:auto;padding:16px}.card{background:#fff;border-radius:18px;padding:18px;margin:12px 0;box-shadow:0 4px 18px #0001}h1{font-size:23px;margin:0 0 5px}.sub{color:#64748b}.pill{display:inline-block;background:#eef2ff;padding:7px 10px;border-radius:999px;font-weight:700;font-size:13px;margin:8px 4px 0 0}button{border:0;border-radius:12px;padding:13px 16px;font-weight:800;background:#111827;color:#fff;margin:4px 4px 4px 0}button.secondary{background:#e5e7eb;color:#111827}button.ok{background:#166534}button:disabled{opacity:.55}#reader{width:100%;max-width:520px;margin:14px auto;display:none}.msg{padding:12px;border-radius:12px;background:#fff7ed;color:#9a3412;margin-top:10px}.err{background:#fee2e2;color:#991b1b}.success{background:#dcfce7;color:#166534}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field label{font-size:12px;color:#64748b}.field div{font-weight:800;border:1px solid #e2e8f0;border-radius:10px;padding:10px;min-height:20px}input{width:100%;box-sizing:border-box;padding:12px;border:1px solid #cbd5e1;border-radius:10px;margin-top:6px}.hide{display:none}.small{font-size:12px;color:#64748b}.status{font-size:13px;font-weight:700;margin-top:10px;padding:10px;border-radius:10px;background:#f1f5f9}.hint{font-size:13px;line-height:1.45;color:#475569}.preview{max-width:100%;border-radius:12px;margin-top:10px;display:none}.diag{font-family:ui-monospace,monospace;font-size:11px;white-space:pre-wrap;background:#0f172a;color:#e2e8f0;padding:10px;border-radius:10px;overflow:auto;max-height:180px}table{border-collapse:collapse;width:100%;font-size:13px}th,td{border:1px solid #e2e8f0;padding:7px;text-align:left}th{background:#f8fafc}
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f4f6f8;
+  color:#202124;
+}
+
+header{
+  background:#1f2937;
+  color:white;
+  padding:18px 20px;
+  text-align:center;
+}
+
+header h1{
+  margin:0;
+  font-size:22px;
+}
+
+header p{
+  margin:6px 0 0;
+  font-size:13px;
+  opacity:.85;
+}
+
+.container{
+  width:100%;
+  max-width:900px;
+  margin:auto;
+  padding:15px;
+}
+
+.card{
+  background:white;
+  border-radius:12px;
+  padding:18px;
+  margin-bottom:15px;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+.card h2{
+  margin:0 0 15px;
+  font-size:18px;
+}
+
+button{
+  border:0;
+  border-radius:8px;
+  padding:12px 16px;
+  font-size:15px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+button.primary{
+  background:#2563eb;
+  color:white;
+}
+
+button.success{
+  background:#16a34a;
+  color:white;
+}
+
+button.secondary{
+  background:#6b7280;
+  color:white;
+}
+
+button.warning{
+  background:#d97706;
+  color:white;
+}
+
+button.danger{
+  background:#dc2626;
+  color:white;
+}
+
+button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+input,
+select,
+textarea{
+  width:100%;
+  padding:11px;
+  border:1px solid #cbd5e1;
+  border-radius:7px;
+  font-size:15px;
+  background:white;
+}
+
+textarea{
+  min-height:80px;
+  resize:vertical;
+}
+
+label{
+  display:block;
+  font-weight:bold;
+  font-size:13px;
+  margin-bottom:5px;
+}
+
+.field{
+  margin-bottom:12px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.grid-3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
+.tabs{
+  display:flex;
+  gap:8px;
+  margin-bottom:15px;
+}
+
+.tabs button{
+  flex:1;
+}
+
+.hidden{
+  display:none!important;
+}
+
+.status{
+  padding:12px;
+  border-radius:8px;
+  margin-top:12px;
+  font-size:14px;
+}
+
+.status.info{
+  background:#eff6ff;
+  color:#1d4ed8;
+}
+
+.status.success{
+  background:#f0fdf4;
+  color:#166534;
+}
+
+.status.error{
+  background:#fef2f2;
+  color:#991b1b;
+}
+
+.status.warning{
+  background:#fffbeb;
+  color:#92400e;
+}
+
+.cargo{
+  border:1px solid #dbe2ea;
+  border-radius:10px;
+  padding:14px;
+  margin-bottom:15px;
+  background:#fafafa;
+}
+
+.cargo h3{
+  margin:0 0 12px;
+  font-size:16px;
+}
+
+.vote-row{
+  display:grid;
+  grid-template-columns:100px 1fr 110px 40px;
+  gap:8px;
+  align-items:end;
+  margin-bottom:8px;
+}
+
+.vote-row input{
+  margin:0;
+}
+
+.remove-btn{
+  width:40px;
+  height:40px;
+  padding:0;
+  background:#dc2626;
+  color:white;
+}
+
+.add-btn{
+  margin-top:5px;
+  background:#e5e7eb;
+  color:#111827;
+}
+
+.small{
+  font-size:12px;
+  color:#6b7280;
+}
+
+.section-badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  background:#e5e7eb;
+  font-size:12px;
+  font-weight:bold;
+  margin-top:5px;
+}
+
+.summary{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:12px;
+}
+
+.summary div{
+  background:#f1f5f9;
+  border-radius:7px;
+  padding:10px;
+  text-align:center;
+}
+
+.summary strong{
+  display:block;
+  font-size:17px;
+}
+
+.camera-box{
+  width:100%;
+  background:#111827;
+  border-radius:10px;
+  overflow:hidden;
+  margin-bottom:12px;
+}
+
+#video{
+  display:block;
+  width:100%;
+  max-height:420px;
+  object-fit:cover;
+}
+
+#canvas{
+  display:none;
+}
+
+.photo-input{
+  margin-top:8px;
+}
+
+.manual-header{
+  background:#f8fafc;
+  border:1px solid #e2e8f0;
+  padding:12px;
+  border-radius:8px;
+  margin-bottom:15px;
+}
+
+@media(max-width:650px){
+  .grid,
+  .grid-3{
+    grid-template-columns:1fr;
+  }
+
+  .vote-row{
+    grid-template-columns:85px 1fr 90px 40px;
+  }
+
+  .tabs{
+    flex-direction:column;
+  }
+}
 </style>
 </head>
+
 <body>
-<div class="wrap">
-<div class="card"><h1>Apuração Desterro/PB — 2026</h1><div class="sub">Leitor externo do Boletim de Urna — versão 2</div><div><span class="pill" id="secaoPill">Seção —</span><span class="pill" id="statusPill">PENDENTE</span></div><div id="jsStatus" class="status">Inicializando…</div></div>
 
-<div class="card"><h2>1. Ler QR Code do BU</h2><div class="hint">A câmera funciona fora do Apps Script. Para uma foto, a versão 2 tenta várias formas de processamento da imagem antes de informar que não conseguiu ler.</div>
-<button id="start" type="button">Iniciar câmera</button><button id="stop" type="button" class="secondary">Parar</button><button id="clear" type="button" class="secondary">Limpar</button><button id="fileBtn" type="button" class="secondary">Ler QR por foto</button>
-<input id="fileInput" type="file" accept="image/*" capture="environment" style="display:none"><div id="reader"></div><img id="preview" class="preview"><div id="msg" class="msg hide"></div></div>
+<header>
+  <h1>APURAÇÃO DESTERRO 2026</h1>
+  <p>Sistema de recebimento e lançamento de Boletins de Urna</p>
+</header>
 
-<div class="card"><h2>2. Conferir dados</h2><div class="grid"><div class="field"><label>Zona</label><div id="zona">—</div></div><div class="field"><label>Seção</label><div id="secao">—</div></div><div class="field"><label>Município</label><div id="muni">—</div></div><div class="field"><label>Urna (IDUE)</label><div id="idue">—</div></div><div class="field"><label>Eleitores aptos</label><div id="apto">—</div></div><div class="field"><label>Comparecimento</label><div id="comp">—</div></div><div class="field"><label>Faltosos</label><div id="falt">—</div></div><div class="field"><label>Quantidade de QR</label><div id="qtdqr">—</div></div></div></div>
-<div class="card"><h2>3. Votos encontrados</h2><div id="votes">Nenhum QR lido ainda.</div></div>
-<div class="card"><h2>4. Enviar lançamento</h2><label>Responsável<input id="responsavel" placeholder="Nome/identificação"></label><br><label>Observação<input id="obs" placeholder="Opcional"></label><button id="send" type="button" class="ok">Enviar para conferência</button></div>
-<div class="card"><details><summary>Diagnóstico técnico</summary><div id="diag" class="diag">Aguardando leitura…</div></details></div>
+<div class="container">
+
+  <!-- =========================
+       ABAS PRINCIPAIS
+  ========================== -->
+
+  <div class="tabs">
+    <button class="primary" onclick="mostrarAba('qr')">
+      📷 Ler QR Code
+    </button>
+
+    <button class="secondary" onclick="mostrarAba('manual')">
+      ✍️ Lançamento Manual
+    </button>
+  </div>
+
+
+  <!-- =========================
+       ABA QR CODE
+  ========================== -->
+
+  <section id="abaQr">
+
+    <div class="card">
+
+      <h2>📷 Receber Boletim de Urna por QR Code</h2>
+
+      <div id="sectionInfo"></div>
+
+      <div class="camera-box">
+        <video id="video" autoplay playsinline></video>
+      </div>
+
+      <canvas id="canvas"></canvas>
+
+      <div class="grid">
+
+        <button
+          class="primary"
+          onclick="iniciarCamera()">
+          📷 Iniciar câmera
+        </button>
+
+        <button
+          class="secondary"
+          onclick="pararCamera()">
+          ⏹️ Parar câmera
+        </button>
+
+      </div>
+
+      <div class="field photo-input">
+
+        <label>
+          Ou selecione uma foto do QR Code
+        </label>
+
+        <input
+          id="qrPhoto"
+          type="file"
+          accept="image/*"
+          capture="environment">
+
+      </div>
+
+      <div
+        id="qrStatus"
+        class="status info">
+        Aguardando leitura do QR Code.
+      </div>
+
+    </div>
+
+
+    <!-- RESULTADO DO QR -->
+
+    <div
+      id="qrResult"
+      class="card hidden">
+
+      <h2>Dados identificados</h2>
+
+      <div id="qrData"></div>
+
+      <button
+        class="success"
+        onclick="enviarDadosQR()">
+        ✅ Enviar BU
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       ABA MANUAL
+  ========================== -->
+
+  <section
+    id="abaManual"
+    class="hidden">
+
+    <div class="card">
+
+      <h2>✍️ Lançamento Manual do BU</h2>
+
+      <div class="manual-header">
+
+        <strong>
+          Atenção
+        </strong>
+
+        <div class="small">
+          Use esta opção quando o QR Code não puder ser lido.
+          O lançamento manual utiliza o mesmo backend do QR Code.
+        </div>
+
+      </div>
+
+
+      <!-- IDENTIFICAÇÃO -->
+
+      <h3>1. Identificação do BU</h3>
+
+      <div class="grid">
+
+        <div class="field">
+
+          <label>Seção</label>
+
+          <select id="manualSecao">
+            <option value="">
+              Selecione a seção
+            </option>
+          </select>
+
+        </div>
+
+        <div class="field">
+
+          <label>IDUE</label>
+
+          <input
+            id="manualIdue"
+            type="text"
+            inputmode="numeric"
+            placeholder="Ex.: 1022116">
+
+        </div>
+
+      </div>
+
+
+      <div class="grid-3">
+
+        <div class="field">
+          <label>Zona</label>
+          <input
+            id="manualZona"
+            type="text"
+            value="30">
+        </div>
+
+        <div class="field">
+          <label>Município</label>
+          <input
+            id="manualMunicipio"
+            type="text"
+            value="DESTERRO">
+        </div>
+
+        <div class="field">
+          <label>Origem</label>
+          <input
+            type="text"
+            value="MANUAL"
+            disabled>
+        </div>
+
+      </div>
+
+
+      <!-- ELEITORES -->
+
+      <h3>2. Dados gerais da seção</h3>
+
+      <div class="grid-3">
+
+        <div class="field">
+
+          <label>Aptos</label>
+
+          <input
+            id="manualAptos"
+            type="number"
+            min="0"
+            oninput="validarManual()">
+
+        </div>
+
+        <div class="field">
+
+          <label>Comparecimento</label>
+
+          <input
+            id="manualComparecimento"
+            type="number"
+            min="0"
+            oninput="validarManual()">
+
+        </div>
+
+        <div class="field">
+
+          <label>Faltosos</label>
+
+          <input
+            id="manualFaltosos"
+            type="number"
+            min="0"
+            oninput="validarManual()">
+
+        </div>
+
+      </div>
+
+
+      <div class="grid-3">
+
+        <div class="field">
+
+          <label>Votos válidos</label>
+
+          <input
+            id="manualValidos"
+            type="number"
+            min="0">
+
+        </div>
+
+        <div class="field">
+
+          <label>Brancos</label>
+
+          <input
+            id="manualBrancos"
+            type="number"
+            min="0">
+
+        </div>
+
+        <div class="field">
+
+          <label>Nulos</label>
+
+          <input
+            id="manualNulos"
+            type="number"
+            min="0">
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="manualValidation"
+        class="status info">
+
+        Preencha os dados gerais.
+
+      </div>
+
+    </div>
+
+
+    <!-- =====================
+         VOTOS
+    ====================== -->
+
+    <div class="card">
+
+      <h2>3. Votos</h2>
+
+      <div class="small">
+        Informe os votos apresentados no BU. Além dos nomes destacados,
+        é possível adicionar outros candidatos, legenda, branco e nulo.
+      </div>
+
+
+      <!-- FEDERAL -->
+
+      <div class="cargo">
+
+        <h3>Deputado Federal</h3>
+
+        <div id="federalRows"></div>
+
+        <button
+          class="add-btn"
+          onclick="adicionarVoto('FEDERAL')">
+          + Outro candidato / legenda
+        </button>
+
+      </div>
+
+
+      <!-- ESTADUAL -->
+
+      <div class="cargo">
+
+        <h3>Deputado Estadual</h3>
+
+        <div id="estadualRows"></div>
+
+        <button
+          class="add-btn"
+          onclick="adicionarVoto('ESTADUAL')">
+          + Outro candidato / legenda
+        </button>
+
+      </div>
+
+
+      <!-- SENADOR -->
+
+      <div class="cargo">
+
+        <h3>Senador</h3>
+
+        <div id="senadorRows"></div>
+
+        <button
+          class="add-btn"
+          onclick="adicionarVoto('SENADOR')">
+          + Outro candidato / legenda
+        </button>
+
+      </div>
+
+
+      <!-- GOVERNADOR -->
+
+      <div class="cargo">
+
+        <h3>Governador</h3>
+
+        <div id="governadorRows"></div>
+
+        <button
+          class="add-btn"
+          onclick="adicionarVoto('GOVERNADOR')">
+          + Outro candidato / legenda
+        </button>
+
+      </div>
+
+
+      <!-- PRESIDENTE -->
+
+      <div class="cargo">
+
+        <h3>Presidente</h3>
+
+        <div id="presidenteRows"></div>
+
+        <button
+          class="add-btn"
+          onclick="adicionarVoto('PRESIDENTE')">
+          + Outro candidato
+        </button>
+
+      </div>
+
+
+      <!-- BRANCO / NULO -->
+
+      <div class="cargo">
+
+        <h3>Brancos e Nulos</h3>
+
+        <div class="vote-row">
+
+          <input
+            type="text"
+            value="BRANCO"
+            disabled>
+
+          <input
+            type="text"
+            value="Voto em branco"
+            disabled>
+
+          <input
+            id="manualBrancoVotos"
+            type="number"
+            min="0"
+            placeholder="Votos">
+
+          <div></div>
+
+        </div>
+
+        <div class="vote-row">
+
+          <input
+            type="text"
+            value="NULO"
+            disabled>
+
+          <input
+            type="text"
+            value="Voto nulo"
+            disabled>
+
+          <input
+            id="manualNuloVotos"
+            type="number"
+            min="0"
+            placeholder="Votos">
+
+          <div></div>
+
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <h2>4. Responsável e observação</h2>
+
+        <div class="field">
+
+          <label>Responsável pelo lançamento</label>
+
+          <input
+            id="manualResponsavel"
+            type="text"
+            placeholder="Nome do responsável">
+
+        </div>
+
+        <div class="field">
+
+          <label>Observação</label>
+
+          <textarea
+            id="manualObservacao"
+            placeholder="Observações sobre o lançamento..."></textarea>
+
+        </div>
+
+      </div>
+
+
+      <div
+        id="manualSendStatus"
+        class="status info">
+        Pronto para lançamento.
+      </div>
+
+
+      <button
+        id="btnEnviarManual"
+        class="success"
+        onclick="enviarManual()">
+        📤 Enviar lançamento manual
+      </button>
+
+    </div>
+
+  </section>
+
 </div>
 
+
+<script src="https://unpkg.com/jsqr@1.4.0/dist/jsQR.js"></script>
+
 <script>
-(function(){
-"use strict";
-var BACKEND="https://script.google.com/macros/s/AKfycbwmaw96kv-LeWk3znO_F4B2Wky8PXxYcFvXYmwLN3R2TZEnv1SYeP1WmXxJmvaMFhM/exec";
-var params=new URLSearchParams(location.search),secaoUrl=(params.get("secao")||"").padStart(3,"0");
-var scanner=null,parts={},parsed=null,qrReady=false,jsQRReady=false;
-function $(id){return document.getElementById(id)}
-function msg(t,k){var e=$("msg");e.textContent=t;e.className="msg "+(k||"");e.classList.remove("hide")}
-function setStatus(t,ok){$("jsStatus").textContent=t;$("jsStatus").style.background=ok?"#dcfce7":"#fff7ed"}
-function diag(t){$("diag").textContent=new Date().toLocaleTimeString()+" — "+t}
-function showSection(){$("secaoPill").textContent="Seção "+(secaoUrl||"—");$("secao").textContent=secaoUrl||"—"}
-window.addEventListener("error",function(e){setStatus("ERRO JavaScript: "+(e.message||"erro desconhecido"),false);diag("ERRO: "+(e.message||"erro desconhecido"))});
-showSection();setStatus("JavaScript ativo. Carregando leitores…",true);
 
-function loadScript(src,name,cb){var s=document.createElement("script");s.src=src;s.async=true;s.onload=function(){diag(name+" carregado.");cb(true)};s.onerror=function(){diag("Falha ao carregar "+name+".");cb(false)};document.head.appendChild(s)}
-loadScript("https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js","html5-qrcode",function(ok){qrReady=ok;if(ok)msg("Leitor de câmera pronto. Toque em Iniciar câmera.","success");else msg("O módulo de câmera não carregou. A leitura por foto ainda pode funcionar se o jsQR carregar.","err");setStatus(ok?"Leitor de câmera carregado.":"Módulo de câmera indisponível.",ok)});
-loadScript("https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js","jsQR",function(ok){jsQRReady=ok;diag(ok?"jsQR pronto para leitura de fotos.":"jsQR não carregou.")});
+/* =========================================================
+   CONFIGURAÇÕES
+========================================================= */
 
-function parseFields(text){var out={},re=/([A-Z][A-Z0-9]*):([A-Za-z0-9._-]+)/g,m;while((m=re.exec(text)))out[m[1]]=m[2];return out}
-function onScan(text){diag("Texto QR recebido: "+text.slice(0,500));var m=text.match(/^QRBU:(\d+):(\d+)/);if(!m){msg("QR detectado, mas não reconhecido como QRBU.","err");return}var idx=Number(m[1]),total=Number(m[2]);parts[idx]=text;msg("QR "+idx+" de "+total+" lido.","success");if(Object.keys(parts).length===total){var codes=Object.keys(parts).sort(function(a,b){return Number(a)-Number(b)}).map(function(k){return parts[k]});try{parsed=parseQRs(codes);render(parsed);stopCamera();msg("Todos os QR Codes foram lidos. Confira os dados.","success")}catch(e){msg(e.message||String(e),"err");diag("Erro de validação: "+(e.message||e))}}}
-function parseQRs(codes){var first=codes[0].match(/^QRBU:(\d+):(\d+)/),total=Number(first[2]),content="";if(codes.length!==total)throw Error("Faltam QR Codes. Esperados "+total+".");for(var i=0;i<codes.length;i++){var h=codes[i].match(/^QRBU:(\d+):(\d+)/);if(!h||Number(h[1])!==i+1||Number(h[2])!==total)throw Error("QR Codes fora de ordem.");content+=(i?" ":"")+codes[i].replace(/^QRBU:\d+:\d+\s*/,"").trim()}var f=parseFields(content),p={zona:f.ZONA||"",secao:f.SECA||"",municipio:f.MUNI||"",idue:f.IDUE||"",apto:Number(f.APTO||0),comparecimento:Number(f.COMP||0),faltosos:Number(f.FALT||0),qtdQr:total,rawQr:codes.join("\n"),votos:[]};if(p.secao&&secaoUrl&&p.secao.padStart(3,"0")!==secaoUrl)throw Error("QR indica seção "+p.secao+"; este link é da seção "+secaoUrl+".");if(p.apto&&p.apto!==p.comparecimento+p.faltosos)throw Error("Aptos não fecham com comparecimento + faltosos.");var cargo=null;content.split(/\s+/).forEach(function(tok){var kv=tok.match(/^([A-Z][A-Z0-9]*):(.+)$/);if(kv){var k=kv[1],v=kv[2];if(k==="CARG")cargo={idEleicao:"",cargo:v,tipo:""};else if(k==="IDEL"&&cargo)cargo.idEleicao=v;else if(k==="TIPO"&&cargo)cargo.tipo=v;return}var cv=tok.match(/^(\d{1,6}):(\d+)$/);if(cv&&cargo)p.votos.push({idEleicao:cargo.idEleicao,cargo:cargo.cargo,tipo:cargo.tipo,codigo:cv[1],votos:Number(cv[2])})});return p}
-function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
-function render(p){[["zona",p.zona],["secao",p.secao],["muni",p.municipio],["idue",p.idue],["apto",p.apto],["comp",p.comparecimento],["falt",p.faltosos],["qtdqr",p.qtdQr]].forEach(function(x){$(x[0]).textContent=x[1]||"0"});if(!p.votos.length){$("votes").textContent="QR lido, mas os votos detalhados não foram reconhecidos nesta versão.";return}var h="<table><tr><th>Eleição</th><th>Cargo</th><th>Código</th><th>Votos</th></tr>";p.votos.forEach(function(v){h+="<tr><td>"+esc(v.idEleicao)+"</td><td>"+esc(v.cargo)+"</td><td>"+esc(v.codigo)+"</td><td>"+v.votos+"</td></tr>"});$("votes").innerHTML=h+"</table>"}
+const BACKEND =
+"https://script.google.com/macros/s/AKfycbxhK0A_ra_MJEkbyC-VF4raUZI2j-SWZVeu8QJDr0l5W-yq_9VsKOATjbO3x1STP9ro/exec";
 
-async function startCamera(){if(!qrReady||!window.Html5Qrcode){msg("Leitor ainda carregando. Aguarde alguns segundos.","err");return}if(!isSecureContext){msg("A página precisa estar em HTTPS.","err");return}try{$("reader").style.display="block";scanner=new Html5Qrcode("reader");var cams=await Html5Qrcode.getCameras();if(!cams.length)throw Error("Nenhuma câmera foi disponibilizada.");var back=cams.find(function(c){return /back|traseira|environment|rear/i.test(c.label)})||cams[cams.length-1];diag("Câmera selecionada: "+(back.label||back.id));await scanner.start(back.id,{fps:10,qrbox:{width:280,height:280},formatsToSupport:[Html5QrcodeSupportedFormats.QR_CODE]},onScan,function(){});msg("Câmera ativa. Aponte para o QR Code do BU.","success")}catch(e){try{if(scanner)await scanner.clear()}catch(_){}scanner=null;msg("Não foi possível abrir a câmera. Verifique a permissão de câmera do site. Detalhe: "+(e.message||e),"err");diag("Erro câmera: "+(e.message||e))}}
-async function stopCamera(){if(scanner){try{await scanner.stop()}catch(e){}try{await scanner.clear()}catch(e){}scanner=null}$("reader").style.display="none"}
-function clearAll(){parts={};parsed=null;stopCamera();$("votes").textContent="Nenhum QR lido ainda.";["zona","muni","idue","apto","comp","falt","qtdqr"].forEach(function(id){$(id).textContent="—"});$("preview").style.display="none";showSection();msg("Tela limpa.","success");diag("Tela limpa.")}
 
-function canvasVariants(img){var w=img.naturalWidth||img.width,h=img.naturalHeight||img.height,max=2200,scale=Math.min(1,max/Math.max(w,h));w=Math.max(1,Math.round(w*scale));h=Math.max(1,Math.round(h*scale));var list=[];function add(name,crop,mode){var cw=Math.round(w*crop.x),ch=Math.round(h*crop.y),sx=Math.round((w-cw)*crop.left),sy=Math.round((h-ch)*crop.top),c=document.createElement("canvas");c.width=cw;c.height=ch;var ctx=c.getContext("2d",{willReadFrequently:true});ctx.imageSmoothingEnabled=true;ctx.drawImage(img,Math.round(sx/scale),Math.round(sy/scale),Math.round(cw/scale),Math.round(ch/scale),0,0,cw,ch);var data=ctx.getImageData(0,0,cw,ch),d=data.data;for(var i=0;i<d.length;i+=4){var y=.299*d[i]+.587*d[i+1]+.114*d[i+2];if(mode==="gray"){d[i]=d[i+1]=d[i+2]=y}else if(mode==="bw"){var v=y>150?255:0;d[i]=d[i+1]=d[i+2]=v}else if(mode==="hi"){var v=Math.max(0,Math.min(255,(y-128)*2+128));d[i]=d[i+1]=d[i+2]=v}}ctx.putImageData(data,0,0);list.push({name:name,canvas:c})}
-add("original",{x:1,y:1,left:0,top:0},"gray");add("center",{x:.78,y:.78,left:.11,top:.11},"gray");add("center-bw",{x:.78,y:.78,left:.11,top:.11},"bw");add("full-bw",{x:1,y:1,left:0,top:0},"bw");add("full-hi",{x:1,y:1,left:0,top:0},"hi");add("lower-center",{x:.78,y:.55,left:.11,top:.38},"gray");return list}
-async function scanPhoto(file){if(!file)return;if(!jsQRReady||!window.jsQR){msg("O leitor de foto ainda está carregando. Aguarde alguns segundos.","err");return}try{var url=URL.createObjectURL(file),img=new Image();img.onload=async function(){try{$("preview").src=url;$("preview").style.display="block";var variants=canvasVariants(img);for(var i=0;i<variants.length;i++){var v=variants[i],ctx=v.canvas.getContext("2d",{willReadFrequently:true}),data=ctx.getImageData(0,0,v.canvas.width,v.canvas.height);diag("Tentando foto: "+v.name+" — "+v.canvas.width+"x"+v.canvas.height);var code=window.jsQR(data.data,data.width,data.height,{inversionAttempts:"attemptBoth"});if(code&&code.data){diag("QR encontrado em "+v.name+".");msg("QR encontrado. Conferindo dados…","success");onScan(code.data);URL.revokeObjectURL(url);return}}msg("A foto foi aberta, mas o QR não foi decodificado. Faça uma foto mais próxima, com o QR inteiro e sem reflexos.","err");diag("Nenhuma das "+variants.length+" tentativas encontrou o QR.")}catch(e){msg("Erro ao processar a foto: "+(e.message||e),"err");diag("Erro foto: "+(e.message||e))}};img.onerror=function(){msg("Não consegui abrir a foto selecionada.","err")};img.src=url}catch(e){msg("Erro ao iniciar leitura da foto: "+(e.message||e),"err")}}
+const CANDIDATOS = {
 
-$("start").onclick=startCamera;$("stop").onclick=stopCamera;$("clear").onclick=clearAll;$("fileBtn").onclick=function(){$("fileInput").click()};$("fileInput").onchange=function(e){scanPhoto(e.target.files[0]);e.target.value=""};
-$("send").onclick=function(){if(!parsed){msg("Leia o QR antes de enviar.","err");return}if(!BACKEND||BACKEND.indexOf("%%")>=0){msg("Backend ainda não configurado nesta página.","err");return}var payload=JSON.stringify(Object.assign({},parsed,{responsavel:$("responsavel").value,observacao:$("obs").value}));var form=document.createElement("form");form.method="POST";form.action=BACKEND;form.target="submitFrame";form.style.display="none";var input=document.createElement("input");input.name="payload";input.value=payload;form.appendChild(input);document.body.appendChild(form);form.submit();form.remove();$("statusPill").textContent="ENVIADO";msg("Lançamento enviado para conferência.","success")};
-setStatus("JavaScript ativo. Leitores carregando…",true);
-})();
+  FEDERAL:[
+    {
+      numero:"1011",
+      candidato:"Hugo Motta"
+    },
+    {
+      numero:"1044",
+      candidato:"Murilo Galdino"
+    }
+  ],
+
+  ESTADUAL:[
+    {
+      numero:"10111",
+      candidato:"Olivia Motta"
+    },
+    {
+      numero:"22333",
+      candidato:"Gesica de Laurindo"
+    }
+  ],
+
+  SENADOR:[
+    {
+      numero:"400",
+      candidato:"João Azevêdo"
+    },
+    {
+      numero:"100",
+      candidato:"Nabor"
+    },
+    {
+      numero:"155",
+      candidato:"Veneziano"
+    }
+  ],
+
+  GOVERNADOR:[
+    {
+      numero:"11",
+      candidato:"Lucas Ribeiro"
+    },
+    {
+      numero:"15",
+      candidato:"Cícero Lucena"
+    },
+    {
+      numero:"22",
+      candidato:"Efraim Filho"
+    }
+  ],
+
+  PRESIDENTE:[
+    {
+      numero:"13",
+      candidato:"Lula"
+    },
+    {
+      numero:"22",
+      candidato:"Flávio Bolsonaro"
+    }
+  ]
+
+};
+
+
+/* =========================================================
+   SEÇÕES
+========================================================= */
+
+const SECOES = [
+
+"1",
+"2",
+"3",
+"4",
+"5",
+"6",
+"7",
+"8",
+"9",
+"10",
+"11",
+"12",
+"13",
+"14",
+"15",
+"16",
+"17",
+"32",
+"33",
+"34",
+"137",
+"140",
+"143",
+"159",
+"161",
+"162",
+"163",
+"164",
+"175",
+"180",
+"506"
+
+];
+
+
+/* =========================================================
+   VARIÁVEIS
+========================================================= */
+
+let stream = null;
+
+let parsedQR = null;
+
+let qrParts = {};
+
+let manualRows = {
+
+  FEDERAL:[],
+  ESTADUAL:[],
+  SENADOR:[],
+  GOVERNADOR:[],
+  PRESIDENTE:[]
+
+};
+
+
+/* =========================================================
+   UTILITÁRIOS
+========================================================= */
+
+function $(id){
+
+  return document.getElementById(id);
+
+}
+
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+function numero(value){
+
+  const n = Number(value);
+
+  return Number.isFinite(n) ? n : 0;
+
+}
+
+
+/* =========================================================
+   ABAS
+========================================================= */
+
+function mostrarAba(aba){
+
+  $("abaQr").classList.add("hidden");
+
+  $("abaManual").classList.add("hidden");
+
+  if(aba === "qr"){
+
+    $("abaQr").classList.remove("hidden");
+
+  }else{
+
+    $("abaManual").classList.remove("hidden");
+
+  }
+
+}
+
+
+/* =========================================================
+   SEÇÃO DA URL
+========================================================= */
+
+function obterSecaoURL(){
+
+  const params =
+    new URLSearchParams(window.location.search);
+
+  return params.get("secao") || "";
+
+}
+
+
+function configurarSecao(){
+
+  const secaoURL = obterSecaoURL();
+
+  const select = $("manualSecao");
+
+  select.innerHTML =
+    '<option value="">Selecione a seção</option>';
+
+  SECOES.forEach(secao => {
+
+    const option =
+      document.createElement("option");
+
+    option.value = secao;
+
+    option.textContent =
+      "Seção " + secao;
+
+    select.appendChild(option);
+
+  });
+
+  if(secaoURL){
+
+    select.value = secaoURL;
+
+    $("sectionInfo").innerHTML =
+
+      `<span class="section-badge">
+        Seção ${escapeHtml(secaoURL)}
+      </span>`;
+
+  }
+
+}
+
+
+/* =========================================================
+   CAMERA
+========================================================= */
+
+async function iniciarCamera(){
+
+  try{
+
+    pararCamera();
+
+    stream =
+      await navigator.mediaDevices.getUserMedia({
+
+        video:{
+          facingMode:{
+            ideal:"environment"
+          }
+        },
+
+        audio:false
+
+      });
+
+    $("video").srcObject = stream;
+
+    $("qrStatus").className =
+      "status info";
+
+    $("qrStatus").textContent =
+      "Câmera ativa. Aponte para o QR Code do BU.";
+
+    requestAnimationFrame(lerCamera);
+
+  }catch(error){
+
+    console.error(error);
+
+    $("qrStatus").className =
+      "status error";
+
+    $("qrStatus").textContent =
+      "Não foi possível acessar a câmera. Tente usar a opção de foto.";
+
+  }
+
+}
+
+
+function pararCamera(){
+
+  if(stream){
+
+    stream.getTracks().forEach(track => track.stop());
+
+    stream = null;
+
+  }
+
+}
+
+
+function lerCamera(){
+
+  if(!stream) return;
+
+  const video = $("video");
+
+  if(video.readyState >= 2){
+
+    const canvas = $("canvas");
+
+    canvas.width = video.videoWidth;
+
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext("2d");
+
+    ctx.drawImage(
+      video,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+    const image =
+      ctx.getImageData(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+    const code =
+      jsQR(
+        image.data,
+        image.width,
+        image.height,
+        {
+          inversionAttempts:"attemptBoth"
+        }
+      );
+
+    if(code){
+
+      onScan(code.data);
+
+      return;
+
+    }
+
+  }
+
+  requestAnimationFrame(lerCamera);
+
+}
+
+
+/* =========================================================
+   FOTO
+========================================================= */
+
+$("qrPhoto").addEventListener(
+  "change",
+  async function(event){
+
+    const file =
+      event.target.files[0];
+
+    if(!file) return;
+
+    try{
+
+      const image =
+        await carregarImagem(file);
+
+      const canvas = $("canvas");
+
+      canvas.width =
+        image.naturalWidth;
+
+      canvas.height =
+        image.naturalHeight;
+
+      const ctx =
+        canvas.getContext("2d");
+
+      ctx.drawImage(
+        image,
+        0,
+        0
+      );
+
+      const data =
+        ctx.getImageData(
+          0,
+          0,
+          canvas.width,
+          canvas.height
+        );
+
+      const code =
+        jsQR(
+          data.data,
+          data.width,
+          data.height,
+          {
+            inversionAttempts:"attemptBoth"
+          }
+        );
+
+      if(!code){
+
+        $("qrStatus").className =
+          "status error";
+
+        $("qrStatus").textContent =
+          "Não foi possível identificar o QR Code nesta imagem.";
+
+        return;
+
+      }
+
+      onScan(code.data);
+
+    }catch(error){
+
+      console.error(error);
+
+      $("qrStatus").className =
+        "status error";
+
+      $("qrStatus").textContent =
+        "Erro ao processar a imagem.";
+
+    }
+
+  }
+);
+
+
+function carregarImagem(file){
+
+  return new Promise((resolve,reject)=>{
+
+    const img =
+      new Image();
+
+    img.onload = () =>
+      resolve(img);
+
+    img.onerror = reject;
+
+    img.src =
+      URL.createObjectURL(file);
+
+  });
+
+}
+
+
+/* =========================================================
+   LEITURA QR
+========================================================= */
+
+function parseFields(text){
+
+  const result = {};
+
+  const regex =
+    /([A-Z][A-Z0-9]*):([A-Za-z0-9._-]+)/g;
+
+  let match;
+
+  while((match = regex.exec(text)) !== null){
+
+    result[match[1]] =
+      match[2];
+
+  }
+
+  return result;
+
+}
+
+
+function onScan(text){
+
+  console.log("QR:",text);
+
+  $("qrStatus").className =
+    "status info";
+
+  $("qrStatus").textContent =
+    "QR Code identificado. Processando...";
+
+  /*
+   * Formato esperado:
+   * QRBU:PARTE:TOTAL
+   */
+
+  const header =
+    text.match(/^QRBU:(\d+):(\d+)/);
+
+  if(!header){
+
+    $("qrStatus").className =
+      "status error";
+
+    $("qrStatus").textContent =
+      "QR Code não reconhecido como BU.";
+
+    return;
+
+  }
+
+  const parte =
+    Number(header[1]);
+
+  const total =
+    Number(header[2]);
+
+  if(!qrParts[total]){
+
+    qrParts = {};
+
+  }
+
+  qrParts[parte] =
+    text;
+
+  const recebidas =
+    Object.keys(qrParts).length;
+
+  $("qrStatus").textContent =
+    `QR ${recebidas} de ${total} recebido.`;
+
+  if(recebidas >= total){
+
+    const codes =
+      [];
+
+    for(let i=1;i<=total;i++){
+
+      if(!qrParts[i]){
+
+        $("qrStatus").className =
+          "status error";
+
+        $("qrStatus").textContent =
+          `Falta o QR ${i} de ${total}.`;
+
+        return;
+
+      }
+
+      codes.push(
+        qrParts[i]
+      );
+
+    }
+
+    try{
+
+      parsedQR =
+        parseQRs(codes);
+
+      renderQR(parsedQR);
+
+      pararCamera();
+
+    }catch(error){
+
+      console.error(error);
+
+      $("qrStatus").className =
+        "status error";
+
+      $("qrStatus").textContent =
+        error.message;
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   PARSER DO QR
+========================================================= */
+
+function parseQRs(codes){
+
+  const full =
+    codes.join(" ");
+
+  const fields =
+    parseFields(full);
+
+  const secao =
+    fields.SECA ||
+    fields.SECAO ||
+    "";
+
+  const idue =
+    fields.IDUE ||
+    "";
+
+  const zona =
+    fields.ZONA ||
+    "";
+
+  const municipio =
+    fields.MUNI ||
+    "";
+
+  const aptos =
+    numero(
+      fields.APTO
+    );
+
+  const comparecimento =
+    numero(
+      fields.COMP
+    );
+
+  const faltosos =
+    numero(
+      fields.FALT
+    );
+
+
+  const secaoURL =
+    obterSecaoURL();
+
+  if(
+    secaoURL &&
+    String(secao).replace(/^0+/,"") !==
+    String(secaoURL).replace(/^0+/,"")
+  ){
+
+    throw new Error(
+      `O QR pertence à seção ${secao}, mas esta página está configurada para a seção ${secaoURL}.`
+    );
+
+  }
+
+
+  if(
+    aptos &&
+    comparecimento +
+    faltosos !==
+    aptos
+  ){
+
+    throw new Error(
+      "Inconsistência no BU: Aptos diferente de Comparecimento + Faltosos."
+    );
+
+  }
+
+
+  const votos = [];
+
+
+  /*
+   * Procura blocos:
+   * CARG:...
+   * IDEL:...
+   * TIPO:...
+   * número:votos
+   *
+   * O parser permanece compatível com o formato
+   * atualmente utilizado no seu index.html.
+   */
+
+  const cargoMatches =
+    full.match(/CARG:[^ ]+/g) || [];
+
+
+  cargoMatches.forEach((cargoToken,index)=>{
+
+    const cargoCodigo =
+      cargoToken
+        .replace("CARG:","");
+
+    let cargo =
+      mapearCargo(cargoCodigo);
+
+    const inicio =
+      full.indexOf(
+        cargoToken
+      );
+
+    const fim =
+      index + 1 <
+      cargoMatches.length
+        ? full.indexOf(
+            cargoMatches[index+1]
+          )
+        : full.length;
+
+    const bloco =
+      full.substring(
+        inicio,
+        fim
+      );
+
+    const tipoMatch =
+      bloco.match(
+        /TIPO:([A-Za-z0-9._-]+)/
+      );
+
+    const tipo =
+      tipoMatch
+        ? tipoMatch[1]
+        : "CANDIDATO";
+
+
+    const tokens =
+      bloco.match(
+        /\b\d{1,6}:\d+\b/g
+      ) || [];
+
+
+    tokens.forEach(token=>{
+
+      const partes =
+        token.split(":");
+
+      if(partes.length !== 2)
+        return;
+
+      const numeroCandidato =
+        partes[0];
+
+      const qtd =
+        numero(
+          partes[1]
+        );
+
+      votos.push({
+
+        cargo: cargo,
+
+        tipo: tipo,
+
+        numero: numeroCandidato,
+
+        candidato:
+          "",
+
+        votos: qtd
+
+      });
+
+    });
+
+  });
+
+
+  return {
+
+    secao:String(secao),
+
+    idue:String(idue),
+
+    zona:String(zona),
+
+    municipio:String(municipio),
+
+    aptos:aptos,
+
+    comparecimento:comparecimento,
+
+    faltosos:faltosos,
+
+    validos:numero(fields.VALID),
+
+    brancos:numero(fields.BRAN),
+
+    nulos:numero(fields.NULO),
+
+    origem:"QR",
+
+    observacao:"",
+
+    votos:votos
+
+  };
+
+}
+
+
+function mapearCargo(codigo){
+
+  const c =
+    String(codigo)
+      .toUpperCase();
+
+  const mapa = {
+
+    "FEDERAL":
+      "DEPUTADO FEDERAL",
+
+    "DF":
+      "DEPUTADO FEDERAL",
+
+    "ESTADUAL":
+      "DEPUTADO ESTADUAL",
+
+    "DE":
+      "DEPUTADO ESTADUAL",
+
+    "SEN":
+      "SENADOR",
+
+    "SENADOR":
+      "SENADOR",
+
+    "GOV":
+      "GOVERNADOR",
+
+    "GOVERNADOR":
+      "GOVERNADOR",
+
+    "PRE":
+      "PRESIDENTE",
+
+    "PRESIDENTE":
+      "PRESIDENTE"
+
+  };
+
+  return mapa[c] || codigo;
+
+}
+
+
+/* =========================================================
+   RENDER QR
+========================================================= */
+
+function renderQR(data){
+
+  $("qrResult")
+    .classList
+    .remove("hidden");
+
+
+  $("qrData").innerHTML = `
+
+    <div class="summary">
+
+      <div>
+        <span>Seção</span>
+        <strong>${escapeHtml(data.secao)}</strong>
+      </div>
+
+      <div>
+        <span>IDUE</span>
+        <strong>${escapeHtml(data.idue)}</strong>
+      </div>
+
+      <div>
+        <span>Aptos</span>
+        <strong>${data.aptos}</strong>
+      </div>
+
+      <div>
+        <span>Comparecimento</span>
+        <strong>${data.comparecimento}</strong>
+      </div>
+
+      <div>
+        <span>Faltosos</span>
+        <strong>${data.faltosos}</strong>
+      </div>
+
+      <div>
+        <span>Válidos</span>
+        <strong>${data.validos}</strong>
+      </div>
+
+      <div>
+        <span>Brancos</span>
+        <strong>${data.brancos}</strong>
+      </div>
+
+      <div>
+        <span>Nulos</span>
+        <strong>${data.nulos}</strong>
+      </div>
+
+    </div>
+
+    <hr>
+
+    <h3>Votos identificados</h3>
+
+    ${
+      data.votos.length
+      ?
+      `<ul>
+        ${
+          data.votos.map(v =>
+            `<li>
+              ${escapeHtml(v.cargo)}
+              —
+              ${escapeHtml(v.numero)}
+              —
+              ${v.votos} votos
+            </li>`
+          ).join("")
+        }
+      </ul>`
+      :
+      `<p class="small">
+        Nenhum voto foi identificado automaticamente.
+      </p>`
+    }
+
+  `;
+
+
+  $("qrStatus").className =
+    "status success";
+
+  $("qrStatus").textContent =
+    "BU processado. Confira os dados antes de enviar.";
+
+}
+
+
+/* =========================================================
+   ENVIO QR
+========================================================= */
+
+async function enviarDadosQR(){
+
+  if(!parsedQR){
+
+    alert(
+      "Nenhum BU foi processado."
+    );
+
+    return;
+
+  }
+
+  const payload =
+    Object.assign(
+      {},
+      parsedQR,
+      {
+        responsavel:
+          $("manualResponsavel")?.value || "",
+
+        observacao:
+          $("manualObservacao")?.value || ""
+      }
+    );
+
+
+  $("qrStatus").className =
+    "status info";
+
+  $("qrStatus").textContent =
+    "Enviando BU...";
+
+
+  try{
+
+    const resposta =
+      await enviarBackend(payload);
+
+    $("qrStatus").className =
+      resposta.sucesso
+      ? "status success"
+      : "status error";
+
+    $("qrStatus").textContent =
+      resposta.mensagem ||
+      "Resposta recebida.";
+
+  }catch(error){
+
+    console.error(error);
+
+    $("qrStatus").className =
+      "status error";
+
+    $("qrStatus").textContent =
+      "Erro ao enviar: " +
+      error.message;
+
+  }
+
+}
+
+
+/* =========================================================
+   CANDIDATOS MANUAIS
+========================================================= */
+
+function criarLinhaVoto(
+  cargo,
+  candidato = "",
+  numeroCandidato = "",
+  tipo = "CANDIDATO"
+){
+
+  const container =
+    document.createElement("div");
+
+  container.className =
+    "vote-row";
+
+
+  const numeroInput =
+    document.createElement("input");
+
+  numeroInput.type =
+    "text";
+
+  numeroInput.inputMode =
+    "numeric";
+
+  numeroInput.placeholder =
+    "Número";
+
+  numeroInput.value =
+    numeroCandidato;
+
+
+  const nomeInput =
+    document.createElement("input");
+
+  nomeInput.type =
+    "text";
+
+  nomeInput.placeholder =
+    "Nome do candidato / legenda";
+
+  nomeInput.value =
+    candidato;
+
+
+  const votosInput =
+    document.createElement("input");
+
+  votosInput.type =
+    "number";
+
+  votosInput.min =
+    "0";
+
+  votosInput.placeholder =
+    "Votos";
+
+
+  const remove =
+    document.createElement("button");
+
+  remove.type =
+    "button";
+
+  remove.className =
+    "remove-btn";
+
+  remove.textContent =
+    "×";
+
+  remove.onclick =
+    () => {
+
+      container.remove();
+
+    };
+
+
+  container.appendChild(
+    numeroInput
+  );
+
+  container.appendChild(
+    nomeInput
+  );
+
+  container.appendChild(
+    votosInput
+  );
+
+  container.appendChild(
+    remove
+  );
+
+
+  const wrapper =
+    document.createElement("div");
+
+  wrapper.dataset.cargo =
+    cargo;
+
+  wrapper.dataset.tipo =
+    tipo;
+
+  wrapper.appendChild(
+    container
+  );
+
+
+  return wrapper;
+
+}
+
+
+function adicionarCandidatoDestacado(
+  cargo,
+  numeroCandidato,
+  candidato
+){
+
+  const container =
+    $(cargo.toLowerCase() + "Rows");
+
+
+  const wrapper =
+    criarLinhaVoto(
+      cargo,
+      candidato,
+      numeroCandidato,
+      "CANDIDATO"
+    );
+
+  container.appendChild(
+    wrapper
+  );
+
+}
+
+
+function adicionarVoto(cargo){
+
+  const container =
+    $(cargo.toLowerCase() + "Rows");
+
+
+  const wrapper =
+    criarLinhaVoto(
+      cargo,
+      "",
+      "",
+      "CANDIDATO"
+    );
+
+  container.appendChild(
+    wrapper
+  );
+
+}
+
+
+/* =========================================================
+   INICIALIZA CANDIDATOS
+========================================================= */
+
+function inicializarCandidatos(){
+
+  Object.keys(CANDIDATOS)
+    .forEach(cargo=>{
+
+      CANDIDATOS[cargo]
+        .forEach(candidato=>{
+
+          adicionarCandidatoDestacado(
+            cargo,
+            candidato.numero,
+            candidato.candidato
+          );
+
+        });
+
+    });
+
+}
+
+
+/* =========================================================
+   COLETAR VOTOS MANUAIS
+========================================================= */
+
+function coletarVotosManuais(){
+
+  const votos = [];
+
+
+  Object.keys(manualRows)
+    .forEach(()=>{});
+
+
+  const cargos = [
+
+    {
+      key:"FEDERAL",
+      id:"federalRows",
+      nome:"DEPUTADO FEDERAL"
+    },
+
+    {
+      key:"ESTADUAL",
+      id:"estadualRows",
+      nome:"DEPUTADO ESTADUAL"
+    },
+
+    {
+      key:"SENADOR",
+      id:"senadorRows",
+      nome:"SENADOR"
+    },
+
+    {
+      key:"GOVERNADOR",
+      id:"governadorRows",
+      nome:"GOVERNADOR"
+    },
+
+    {
+      key:"PRESIDENTE",
+      id:"presidenteRows",
+      nome:"PRESIDENTE"
+    }
+
+  ];
+
+
+  cargos.forEach(cargo=>{
+
+    const container =
+      $(cargo.id);
+
+    const rows =
+      container.querySelectorAll(
+        ".vote-row"
+      );
+
+
+    rows.forEach(row=>{
+
+      const inputs =
+        row.querySelectorAll("input");
+
+      if(inputs.length < 3)
+        return;
+
+      const numero =
+        inputs[0].value.trim();
+
+      const candidato =
+        inputs[1].value.trim();
+
+      const qtd =
+        numeroValue(
+          inputs[2].value
+        );
+
+
+      if(
+        !numero &&
+        !candidato &&
+        !qtd
+      ){
+
+        return;
+
+      }
+
+
+      votos.push({
+
+        cargo:cargo.nome,
+
+        tipo:
+          numero
+          ? "CANDIDATO"
+          : "LEGENDA",
+
+        numero:numero,
+
+        candidato:candidato,
+
+        votos:qtd
+
+      });
+
+    });
+
+  });
+
+
+  const branco =
+    numeroValue(
+      $("manualBrancoVotos").value
+    );
+
+  if(branco > 0){
+
+    votos.push({
+
+      cargo:"BRANCO",
+
+      tipo:"BRANCO",
+
+      numero:"",
+
+      candidato:"",
+
+      votos:branco
+
+    });
+
+  }
+
+
+  const nulo =
+    numeroValue(
+      $("manualNuloVotos").value
+    );
+
+  if(nulo > 0){
+
+    votos.push({
+
+      cargo:"NULO",
+
+      tipo:"NULO",
+
+      numero:"",
+
+      candidato:"",
+
+      votos:nulo
+
+    });
+
+  }
+
+
+  return votos;
+
+}
+
+
+function numeroValue(value){
+
+  const n =
+    parseInt(
+      value,
+      10
+    );
+
+  return Number.isFinite(n)
+    ? n
+    : 0;
+
+}
+
+
+/* =========================================================
+   VALIDAÇÃO MANUAL
+========================================================= */
+
+function validarManual(){
+
+  const aptos =
+    numeroValue(
+      $("manualAptos").value
+    );
+
+  const comparecimento =
+    numeroValue(
+      $("manualComparecimento").value
+    );
+
+  const faltosos =
+    numeroValue(
+      $("manualFaltosos").value
+    );
+
+
+  if(
+    !aptos &&
+    !comparecimento &&
+    !faltosos
+  ){
+
+    $("manualValidation").className =
+      "status info";
+
+    $("manualValidation").textContent =
+      "Preencha os dados gerais.";
+
+    return false;
+
+  }
+
+
+  if(
+    comparecimento +
+    faltosos !==
+    aptos
+  ){
+
+    $("manualValidation").className =
+      "status error";
+
+    $("manualValidation").textContent =
+      `Erro: ${comparecimento} + ${faltosos} = ${
+        comparecimento + faltosos
+      }, mas Aptos = ${aptos}.`;
+
+    return false;
+
+  }
+
+
+  $("manualValidation").className =
+    "status success";
+
+  $("manualValidation").textContent =
+    "✓ Aptos = Comparecimento + Faltosos.";
+
+  return true;
+
+}
+
+
+/* =========================================================
+   ENVIO MANUAL
+========================================================= */
+
+async function enviarManual(){
+
+  const secao =
+    $("manualSecao").value.trim();
+
+  const idue =
+    $("manualIdue").value.trim();
+
+
+  if(!secao){
+
+    alert(
+      "Selecione a seção."
+    );
+
+    return;
+
+  }
+
+
+  if(!idue){
+
+    alert(
+      "Informe o IDUE."
+    );
+
+    return;
+
+  }
+
+
+  if(!validarManual()){
+
+    alert(
+      "Corrija os dados gerais antes de enviar."
+    );
+
+    return;
+
+  }
+
+
+  const aptos =
+    numeroValue(
+      $("manualAptos").value
+    );
+
+  const comparecimento =
+    numeroValue(
+      $("manualComparecimento").value
+    );
+
+  const faltosos =
+    numeroValue(
+      $("manualFaltosos").value
+    );
+
+  const validos =
+    numeroValue(
+      $("manualValidos").value
+    );
+
+  const brancos =
+    numeroValue(
+      $("manualBrancos").value
+    );
+
+  const nulos =
+    numeroValue(
+      $("manualNulos").value
+    );
+
+
+  const votos =
+    coletarVotosManuais();
+
+
+  if(!votos.length){
+
+    alert(
+      "Informe pelo menos um voto antes de enviar."
+    );
+
+    return;
+
+  }
+
+
+  const payload = {
+
+    secao:secao,
+
+    idue:idue,
+
+    zona:
+      $("manualZona").value.trim(),
+
+    municipio:
+      $("manualMunicipio").value.trim(),
+
+    aptos:aptos,
+
+    comparecimento:
+      comparecimento,
+
+    faltosos:
+      faltosos,
+
+    validos:
+      validos,
+
+    brancos:
+      brancos,
+
+    nulos:
+      nulos,
+
+    origem:"MANUAL",
+
+    observacao:
+      $("manualObservacao").value.trim(),
+
+    responsavel:
+      $("manualResponsavel").value.trim(),
+
+    votos:votos
+
+  };
+
+
+  const botao =
+    $("btnEnviarManual");
+
+  botao.disabled =
+    true;
+
+  $("manualSendStatus").className =
+    "status info";
+
+  $("manualSendStatus").textContent =
+    "Enviando lançamento manual...";
+
+
+  try{
+
+    const resposta =
+      await enviarBackend(payload);
+
+
+    if(resposta.sucesso){
+
+      $("manualSendStatus").className =
+        "status success";
+
+      $("manualSendStatus").textContent =
+        resposta.mensagem ||
+        "Lançamento enviado com sucesso.";
+
+      /*
+       * Não limpa automaticamente os campos.
+       * Isso permite conferir os dados enviados.
+       */
+
+    }else{
+
+      $("manualSendStatus").className =
+        "status error";
+
+      $("manualSendStatus").textContent =
+        resposta.mensagem ||
+        "O backend recusou o lançamento.";
+
+    }
+
+
+  }catch(error){
+
+    console.error(error);
+
+    $("manualSendStatus").className =
+      "status error";
+
+    $("manualSendStatus").textContent =
+      "Erro ao enviar: " +
+      error.message;
+
+  }finally{
+
+    botao.disabled =
+      false;
+
+  }
+
+}
+
+
+/* =========================================================
+   ENVIO AO BACKEND
+========================================================= */
+
+async function enviarBackend(payload){
+
+  const form =
+    new URLSearchParams();
+
+  form.append(
+    "payload",
+    JSON.stringify(payload)
+  );
+
+
+  const response =
+    await fetch(
+      BACKEND,
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/x-www-form-urlencoded;charset=UTF-8"
+        },
+
+        body:form.toString()
+
+      }
+    );
+
+
+  if(!response.ok){
+
+    throw new Error(
+      "HTTP " +
+      response.status
+    );
+
+  }
+
+
+  const text =
+    await response.text();
+
+
+  try{
+
+    return JSON.parse(text);
+
+  }catch(error){
+
+    console.error(
+      "Resposta do backend:",
+      text
+    );
+
+    throw new Error(
+      "O backend retornou uma resposta que não é JSON."
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   INICIALIZAÇÃO
+========================================================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function(){
+
+    configurarSecao();
+
+    inicializarCandidatos();
+
+    mostrarAba("qr");
+
+  }
+);
+
 </script>
-<iframe name="submitFrame" style="display:none"></iframe>
-</body></html>
+
+</body>
+</html>
