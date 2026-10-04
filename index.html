@@ -18,7 +18,7 @@ input{width:100%;box-sizing:border-box;padding:12px;border:1px solid #cbd5e1;bor
 table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:7px;border-bottom:1px solid #e5e7eb;text-align:left}
 .small{font-size:12px;color:#64748b}.hide{display:none}
 </style>
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -31,9 +31,10 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:7px;borde
   <div class="card">
     <h2>1. Ler QR Code do BU</h2>
     <div class="sub">A câmera é aberta nesta página externa, fora do sandbox do Apps Script.</div>
-    <button id="start">Iniciar câmera</button>
+    <button id="start" disabled>Carregando leitor…</button>
     <button class="secondary" id="stop">Parar</button>
     <button class="secondary" id="clear">Limpar</button>
+    <label style="display:inline-block"><button type="button" class="secondary" id="fileBtn">Ler QR por foto</button><input id="fileInput" type="file" accept="image/*" capture="environment" style="display:none"></label>
     <div id="reader"></div>
     <div id="msg" class="msg hide"></div>
   </div>
@@ -77,7 +78,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:7px;borde
 </div>
 
 <script>
-const BACKEND = "https://script.google.com/macros/s/AKfycbwmaw96kv-LeWk3znO_F4B2Wky8PXxYcFvXYmwLN3R2TZEnv1SYeP1WmXxJmvaMFhM/exec";
+const BACKEND = "https://script.google.com/macros/s/AKfycbwmaw96kv-LeWk3znO_F4B2Wky8PXxYcFvXYmwLN3R2TZEnv1SYeP1WmXxJmvaMFhM/exec/exec";
 const params = new URLSearchParams(location.search);
 const secaoUrl = (params.get("secao")||"").padStart(3,"0");
 document.getElementById("secaoPill").textContent = "Seção " + (secaoUrl||"—");
@@ -179,15 +180,33 @@ function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
 
 async function startCamera(){
   clearMsg();
+  if(!window.isSecureContext){msg("A câmera exige HTTPS. Esta página precisa abrir por https://.","err");return}
+  if(!window.Html5Qrcode){msg("O módulo de leitura QR não carregou. Atualize a página e tente novamente. Se continuar, use Ler QR por foto.","err");return}
   document.getElementById("reader").style.display="block";
-  if(!window.isSecureContext){msg("A câmera exige HTTPS. Publique o leitor em uma URL HTTPS.","err");return}
   try{
     scanner=new Html5Qrcode("reader");
-    const config={fps:10,qrbox:{width:260,height:260},aspectRatio:1.0};
-    await scanner.start({facingMode:"environment"},config,onScan,()=>{});
+    const config={fps:10,qrbox:{width:280,height:280},aspectRatio:1.0,formatsToSupport:[Html5QrcodeSupportedFormats.QR_CODE]};
+    const cameras=await Html5Qrcode.getCameras();
+    if(!cameras || !cameras.length) throw new Error("Nenhuma câmera foi disponibilizada pelo navegador.");
+    const back=cameras.find(c=>/back|traseira|environment|rear/i.test(c.label)) || cameras[cameras.length-1];
+    await scanner.start(back.id,config,onScan,()=>{});
+    msg("Câmera ativa. Aponte para o QR Code do BU.","success");
   }catch(e){
-    msg("Não foi possível abrir a câmera. Verifique se o site está em HTTPS e se o navegador autorizou a câmera. "+(e.message||e),"err");
+    try{ if(scanner){await scanner.clear();} }catch(_){}
+    scanner=null;
+    msg("Não foi possível abrir a câmera. No iPhone, permita a câmera para este site em Safari > aA > Ajustes do Site > Câmera > Permitir. Detalhe: "+(e.message||e),"err");
   }
+}
+
+async function scanFile(file){
+  if(!file || !window.Html5Qrcode){msg("O leitor QR ainda não carregou. Atualize a página.","err");return}
+  try{
+    const temp=new Html5Qrcode("reader");
+    document.getElementById("reader").style.display="block";
+    const text=await temp.scanFile(file,true);
+    onScan(text);
+    try{await temp.clear()}catch(_){}
+  }catch(e){msg("Não consegui ler o QR nessa foto. Tente aproximar e fotografar o QR inteiro.","err")}
 }
 async function stopCamera(){
   if(scanner){try{await scanner.stop()}catch(e){}try{await scanner.clear()}catch(e){}scanner=null}
@@ -202,6 +221,13 @@ function clearAll(){
 document.getElementById("start").onclick=startCamera;
 document.getElementById("stop").onclick=stopCamera;
 document.getElementById("clear").onclick=clearAll;
+document.getElementById("fileBtn").onclick=()=>document.getElementById("fileInput").click();
+document.getElementById("fileInput").onchange=e=>scanFile(e.target.files[0]);
+window.addEventListener("load",()=>{
+  const b=document.getElementById("start");
+  if(window.Html5Qrcode){b.disabled=false;b.textContent="Iniciar câmera";}
+  else {b.disabled=false;b.textContent="Iniciar câmera";msg("O módulo de QR não carregou. Você ainda pode tentar Ler QR por foto.","err");}
+});
 
 document.getElementById("send").onclick=()=>{
   if(!parsed){msg("Leia o QR Code antes de enviar.","err");return}
