@@ -2,2514 +2,408 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Apuração Desterro 2026</title>
-
 <style>
-*{
-  box-sizing:border-box;
-}
-
-body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:#f4f6f8;
-  color:#202124;
-}
-
-header{
-  background:#1f2937;
-  color:white;
-  padding:18px 20px;
-  text-align:center;
-}
-
-header h1{
-  margin:0;
-  font-size:22px;
-}
-
-header p{
-  margin:6px 0 0;
-  font-size:13px;
-  opacity:.85;
-}
-
-.container{
-  width:100%;
-  max-width:900px;
-  margin:auto;
-  padding:15px;
-}
-
-.card{
-  background:white;
-  border-radius:12px;
-  padding:18px;
-  margin-bottom:15px;
-  box-shadow:0 2px 8px rgba(0,0,0,.08);
-}
-
-.card h2{
-  margin:0 0 15px;
-  font-size:18px;
-}
-
-button{
-  border:0;
-  border-radius:8px;
-  padding:12px 16px;
-  font-size:15px;
-  cursor:pointer;
-  font-weight:bold;
-}
-
-button.primary{
-  background:#2563eb;
-  color:white;
-}
-
-button.success{
-  background:#16a34a;
-  color:white;
-}
-
-button.secondary{
-  background:#6b7280;
-  color:white;
-}
-
-button.warning{
-  background:#d97706;
-  color:white;
-}
-
-button.danger{
-  background:#dc2626;
-  color:white;
-}
-
-button:disabled{
-  opacity:.5;
-  cursor:not-allowed;
-}
-
-input,
-select,
-textarea{
-  width:100%;
-  padding:11px;
-  border:1px solid #cbd5e1;
-  border-radius:7px;
-  font-size:15px;
-  background:white;
-}
-
-textarea{
-  min-height:80px;
-  resize:vertical;
-}
-
-label{
-  display:block;
-  font-weight:bold;
-  font-size:13px;
-  margin-bottom:5px;
-}
-
-.field{
-  margin-bottom:12px;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;
-}
-
-.grid-3{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px;
-}
-
-.tabs{
-  display:flex;
-  gap:8px;
-  margin-bottom:15px;
-}
-
-.tabs button{
-  flex:1;
-}
-
-.hidden{
-  display:none!important;
-}
-
-.status{
-  padding:12px;
-  border-radius:8px;
-  margin-top:12px;
-  font-size:14px;
-}
-
-.status.info{
-  background:#eff6ff;
-  color:#1d4ed8;
-}
-
-.status.success{
-  background:#f0fdf4;
-  color:#166534;
-}
-
-.status.error{
-  background:#fef2f2;
-  color:#991b1b;
-}
-
-.status.warning{
-  background:#fffbeb;
-  color:#92400e;
-}
-
-.cargo{
-  border:1px solid #dbe2ea;
-  border-radius:10px;
-  padding:14px;
-  margin-bottom:15px;
-  background:#fafafa;
-}
-
-.cargo h3{
-  margin:0 0 12px;
-  font-size:16px;
-}
-
-.vote-row{
-  display:grid;
-  grid-template-columns:100px 1fr 110px 40px;
-  gap:8px;
-  align-items:end;
-  margin-bottom:8px;
-}
-
-.vote-row input{
-  margin:0;
-}
-
-.remove-btn{
-  width:40px;
-  height:40px;
-  padding:0;
-  background:#dc2626;
-  color:white;
-}
-
-.add-btn{
-  margin-top:5px;
-  background:#e5e7eb;
-  color:#111827;
-}
-
-.small{
-  font-size:12px;
-  color:#6b7280;
-}
-
-.section-badge{
-  display:inline-block;
-  padding:5px 9px;
-  border-radius:20px;
-  background:#e5e7eb;
-  font-size:12px;
-  font-weight:bold;
-  margin-top:5px;
-}
-
-.summary{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
-  margin-top:12px;
-}
-
-.summary div{
-  background:#f1f5f9;
-  border-radius:7px;
-  padding:10px;
-  text-align:center;
-}
-
-.summary strong{
-  display:block;
-  font-size:17px;
-}
-
-.camera-box{
-  width:100%;
-  background:#111827;
-  border-radius:10px;
-  overflow:hidden;
-  margin-bottom:12px;
-}
-
-#video{
-  display:block;
-  width:100%;
-  max-height:420px;
-  object-fit:cover;
-}
-
-#canvas{
-  display:none;
-}
-
-.photo-input{
-  margin-top:8px;
-}
-
-.manual-header{
-  background:#f8fafc;
-  border:1px solid #e2e8f0;
-  padding:12px;
-  border-radius:8px;
-  margin-bottom:15px;
-}
-
-@media(max-width:650px){
-  .grid,
-  .grid-3{
-    grid-template-columns:1fr;
-  }
-
-  .vote-row{
-    grid-template-columns:85px 1fr 90px 40px;
-  }
-
-  .tabs{
-    flex-direction:column;
-  }
-}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f4f6;color:#111827}
+.wrap{max-width:900px;margin:auto;padding:18px}
+header{background:#111827;color:#fff;border-radius:16px;padding:20px;margin-bottom:16px}
+h1{margin:0 0 6px;font-size:23px}.sub{opacity:.8;font-size:14px}
+.card{background:#fff;border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 2px 10px #0000000d}
+h2{font-size:18px;margin:0 0 14px}
+h3{font-size:16px;margin:18px 0 10px;border-bottom:1px solid #e5e7eb;padding-bottom:7px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+label{display:block;font-size:13px;font-weight:700;color:#374151}
+input,select,textarea{width:100%;margin-top:5px;padding:11px;border:1px solid #d1d5db;border-radius:10px;font-size:15px;background:#fff}
+input[readonly]{background:#f3f4f6}
+textarea{min-height:80px;resize:vertical}
+button{border:0;border-radius:10px;padding:12px 15px;font-weight:700;cursor:pointer}
+.primary{background:#111827;color:#fff}.secondary{background:#e5e7eb;color:#111827}.success{background:#166534;color:#fff}.danger{background:#b91c1c;color:#fff}
+.row{display:grid;grid-template-columns:100px 1fr 110px;gap:8px;align-items:end;margin-bottom:8px}
+.row .name{font-size:14px;font-weight:700;padding:11px 0}
+.candidate-head{display:grid;grid-template-columns:100px 1fr 110px;gap:8px;font-size:11px;color:#6b7280;font-weight:700;margin-bottom:4px}
+.other{background:#f9fafb;border:1px solid #e5e7eb;padding:10px;border-radius:10px;margin-top:8px}
+.msg{padding:12px;border-radius:10px;margin:10px 0;font-weight:700;display:none}.msg.show{display:block}.ok{background:#dcfce7;color:#166534}.err{background:#fee2e2;color:#991b1b}.info{background:#e0f2fe;color:#075985}
+.status{font-size:12px;background:#e5e7eb;border-radius:999px;padding:6px 10px;display:inline-block}
+.hidden{display:none!important}
+#reader{width:100%;max-width:520px;margin:10px auto}.preview{max-width:100%;max-height:360px;display:none;border-radius:12px;margin-top:10px}
+.vote-summary{background:#f9fafb;padding:10px;border-radius:10px;font-size:13px;margin-top:10px}
+@media(max-width:650px){.grid,.grid3{grid-template-columns:1fr}.row,.candidate-head{grid-template-columns:80px 1fr 90px}}
 </style>
 </head>
-
 <body>
-
+<div class="wrap">
 <header>
-  <h1>APURAÇÃO DESTERRO 2026</h1>
-  <p>Sistema de recebimento e lançamento de Boletins de Urna</p>
+  <h1>Apuração Desterro/PB 2026</h1>
+  <div class="sub">Recebimento de BU — leitura por QR ou lançamento manual</div>
 </header>
 
-<div class="container">
-
-  <!-- =========================
-       ABAS PRINCIPAIS
-  ========================== -->
-
-  <div class="tabs">
-    <button class="primary" onclick="mostrarAba('qr')">
-      📷 Ler QR Code
-    </button>
-
-    <button class="secondary" onclick="mostrarAba('manual')">
-      ✍️ Lançamento Manual
-    </button>
+<div class="card">
+  <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
+    <h2 style="margin:0">1. Seção</h2>
+    <span id="secaoPill" class="status">Seção —</span>
   </div>
-
-
-  <!-- =========================
-       ABA QR CODE
-  ========================== -->
-
-  <section id="abaQr">
-
-    <div class="card">
-
-      <h2>📷 Receber Boletim de Urna por QR Code</h2>
-
-      <div id="sectionInfo"></div>
-
-      <div class="camera-box">
-        <video id="video" autoplay playsinline></video>
-      </div>
-
-      <canvas id="canvas"></canvas>
-
-      <div class="grid">
-
-        <button
-          class="primary"
-          onclick="iniciarCamera()">
-          📷 Iniciar câmera
-        </button>
-
-        <button
-          class="secondary"
-          onclick="pararCamera()">
-          ⏹️ Parar câmera
-        </button>
-
-      </div>
-
-      <div class="field photo-input">
-
-        <label>
-          Ou selecione uma foto do QR Code
-        </label>
-
-        <input
-          id="qrPhoto"
-          type="file"
-          accept="image/*"
-          capture="environment">
-
-      </div>
-
-      <div
-        id="qrStatus"
-        class="status info">
-        Aguardando leitura do QR Code.
-      </div>
-
-    </div>
-
-
-    <!-- RESULTADO DO QR -->
-
-    <div
-      id="qrResult"
-      class="card hidden">
-
-      <h2>Dados identificados</h2>
-
-      <div id="qrData"></div>
-
-      <button
-        class="success"
-        onclick="enviarDadosQR()">
-        ✅ Enviar BU
-      </button>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       ABA MANUAL
-  ========================== -->
-
-  <section
-    id="abaManual"
-    class="hidden">
-
-    <div class="card">
-
-      <h2>✍️ Lançamento Manual do BU</h2>
-
-      <div class="manual-header">
-
-        <strong>
-          Atenção
-        </strong>
-
-        <div class="small">
-          Use esta opção quando o QR Code não puder ser lido.
-          O lançamento manual utiliza o mesmo backend do QR Code.
-        </div>
-
-      </div>
-
-
-      <!-- IDENTIFICAÇÃO -->
-
-      <h3>1. Identificação do BU</h3>
-
-      <div class="grid">
-
-        <div class="field">
-
-          <label>Seção</label>
-
-          <select id="manualSecao">
-            <option value="">
-              Selecione a seção
-            </option>
-          </select>
-
-        </div>
-
-        <div class="field">
-
-          <label>IDUE</label>
-
-          <input
-            id="manualIdue"
-            type="text"
-            inputmode="numeric"
-            placeholder="Ex.: 1022116">
-
-        </div>
-
-      </div>
-
-
-      <div class="grid-3">
-
-        <div class="field">
-          <label>Zona</label>
-          <input
-            id="manualZona"
-            type="text"
-            value="30">
-        </div>
-
-        <div class="field">
-          <label>Município</label>
-          <input
-            id="manualMunicipio"
-            type="text"
-            value="DESTERRO">
-        </div>
-
-        <div class="field">
-          <label>Origem</label>
-          <input
-            type="text"
-            value="MANUAL"
-            disabled>
-        </div>
-
-      </div>
-
-
-      <!-- ELEITORES -->
-
-      <h3>2. Dados gerais da seção</h3>
-
-      <div class="grid-3">
-
-        <div class="field">
-
-          <label>Aptos</label>
-
-          <input
-            id="manualAptos"
-            type="number"
-            min="0"
-            oninput="validarManual()">
-
-        </div>
-
-        <div class="field">
-
-          <label>Comparecimento</label>
-
-          <input
-            id="manualComparecimento"
-            type="number"
-            min="0"
-            oninput="validarManual()">
-
-        </div>
-
-        <div class="field">
-
-          <label>Faltosos</label>
-
-          <input
-            id="manualFaltosos"
-            type="number"
-            min="0"
-            oninput="validarManual()">
-
-        </div>
-
-      </div>
-
-
-      <div class="grid-3">
-
-        <div class="field">
-
-          <label>Votos válidos</label>
-
-          <input
-            id="manualValidos"
-            type="number"
-            min="0">
-
-        </div>
-
-        <div class="field">
-
-          <label>Brancos</label>
-
-          <input
-            id="manualBrancos"
-            type="number"
-            min="0">
-
-        </div>
-
-        <div class="field">
-
-          <label>Nulos</label>
-
-          <input
-            id="manualNulos"
-            type="number"
-            min="0">
-
-        </div>
-
-      </div>
-
-
-      <div
-        id="manualValidation"
-        class="status info">
-
-        Preencha os dados gerais.
-
-      </div>
-
-    </div>
-
-
-    <!-- =====================
-         VOTOS
-    ====================== -->
-
-    <div class="card">
-
-      <h2>3. Votos</h2>
-
-      <div class="small">
-        Informe os votos apresentados no BU. Além dos nomes destacados,
-        é possível adicionar outros candidatos, legenda, branco e nulo.
-      </div>
-
-
-      <!-- FEDERAL -->
-
-      <div class="cargo">
-
-        <h3>Deputado Federal</h3>
-
-        <div id="federalRows"></div>
-
-        <button
-          class="add-btn"
-          onclick="adicionarVoto('FEDERAL')">
-          + Outro candidato / legenda
-        </button>
-
-      </div>
-
-
-      <!-- ESTADUAL -->
-
-      <div class="cargo">
-
-        <h3>Deputado Estadual</h3>
-
-        <div id="estadualRows"></div>
-
-        <button
-          class="add-btn"
-          onclick="adicionarVoto('ESTADUAL')">
-          + Outro candidato / legenda
-        </button>
-
-      </div>
-
-
-      <!-- SENADOR -->
-
-      <div class="cargo">
-
-        <h3>Senador</h3>
-
-        <div id="senadorRows"></div>
-
-        <button
-          class="add-btn"
-          onclick="adicionarVoto('SENADOR')">
-          + Outro candidato / legenda
-        </button>
-
-      </div>
-
-
-      <!-- GOVERNADOR -->
-
-      <div class="cargo">
-
-        <h3>Governador</h3>
-
-        <div id="governadorRows"></div>
-
-        <button
-          class="add-btn"
-          onclick="adicionarVoto('GOVERNADOR')">
-          + Outro candidato / legenda
-        </button>
-
-      </div>
-
-
-      <!-- PRESIDENTE -->
-
-      <div class="cargo">
-
-        <h3>Presidente</h3>
-
-        <div id="presidenteRows"></div>
-
-        <button
-          class="add-btn"
-          onclick="adicionarVoto('PRESIDENTE')">
-          + Outro candidato
-        </button>
-
-      </div>
-
-
-      <!-- BRANCO / NULO -->
-
-      <div class="cargo">
-
-        <h3>Brancos e Nulos</h3>
-
-        <div class="vote-row">
-
-          <input
-            type="text"
-            value="BRANCO"
-            disabled>
-
-          <input
-            type="text"
-            value="Voto em branco"
-            disabled>
-
-          <input
-            id="manualBrancoVotos"
-            type="number"
-            min="0"
-            placeholder="Votos">
-
-          <div></div>
-
-        </div>
-
-        <div class="vote-row">
-
-          <input
-            type="text"
-            value="NULO"
-            disabled>
-
-          <input
-            type="text"
-            value="Voto nulo"
-            disabled>
-
-          <input
-            id="manualNuloVotos"
-            type="number"
-            min="0"
-            placeholder="Votos">
-
-          <div></div>
-
-        </div>
-
-      </div>
-
-
-      <div class="card">
-
-        <h2>4. Responsável e observação</h2>
-
-        <div class="field">
-
-          <label>Responsável pelo lançamento</label>
-
-          <input
-            id="manualResponsavel"
-            type="text"
-            placeholder="Nome do responsável">
-
-        </div>
-
-        <div class="field">
-
-          <label>Observação</label>
-
-          <textarea
-            id="manualObservacao"
-            placeholder="Observações sobre o lançamento..."></textarea>
-
-        </div>
-
-      </div>
-
-
-      <div
-        id="manualSendStatus"
-        class="status info">
-        Pronto para lançamento.
-      </div>
-
-
-      <button
-        id="btnEnviarManual"
-        class="success"
-        onclick="enviarManual()">
-        📤 Enviar lançamento manual
-      </button>
-
-    </div>
-
-  </section>
-
+  <div class="grid">
+    <label>Seção<input id="secao" placeholder="Ex.: 506"></label>
+    <label>IDUE<input id="idue" placeholder="Ex.: 1022116"></label>
+    <label>Zona<input id="zona" placeholder="Ex.: 30"></label>
+    <label>Município<input id="municipio" placeholder="DESTERRO"></label>
+  </div>
 </div>
 
+<div class="card">
+  <h2>2. Leitura do BU</h2>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button id="start" class="primary">Iniciar câmera</button>
+    <button id="stop" class="secondary">Parar câmera</button>
+    <button id="fileBtn" class="secondary">Ler foto</button>
+    <button id="manualBtn" class="secondary">Lançamento Manual</button>
+    <button id="clear" class="danger">Limpar</button>
+  </div>
+  <input id="fileInput" type="file" accept="image/*" class="hidden">
+  <div id="reader"></div>
+  <img id="preview" class="preview">
+  <div id="msg" class="msg"></div>
+  <div id="diag" style="font-size:12px;color:#6b7280;margin-top:8px"></div>
+</div>
 
-<script src="https://unpkg.com/jsqr@1.4.0/dist/jsQR.js"></script>
+<div id="manualCard" class="card">
+  <h2>3. Dados da seção</h2>
+  <div class="grid3">
+    <label>Aptos<input id="apto" type="number" min="0"></label>
+    <label>Comparecimento<input id="comp" type="number" min="0"></label>
+    <label>Faltosos<input id="falt" type="number" min="0"></label>
+    <label>Válidos<input id="validos" type="number" min="0"></label>
+    <label>Brancos<input id="brancos" type="number" min="0"></label>
+    <label>Nulos<input id="nulos" type="number" min="0"></label>
+  </div>
+  <div id="balance" class="vote-summary">Aptos = Comparecimento + Faltosos</div>
+</div>
+
+<div id="manualVotes" class="card">
+  <h2>4. Votos</h2>
+  <div id="candidateSections"></div>
+  <div class="vote-summary">Brancos e nulos são informados somente nos campos gerais acima. Não é necessário lançá-los novamente por cargo.</div>
+</div>
+
+<div class="card">
+  <h2>5. Identificação do lançamento</h2>
+  <div class="grid">
+    <label>Origem
+      <select id="origem">
+        <option value="MANUAL">MANUAL</option>
+        <option value="QR">QR</option>
+      </select>
+    </label>
+    <label>Responsável<input id="responsavel" placeholder="Nome do responsável"></label>
+  </div>
+  <label style="margin-top:10px">Observação<textarea id="obs" placeholder="Observações, se necessário"></textarea></label>
+  <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+    <button id="send" class="success">Enviar lançamento</button>
+  </div>
+</div>
+
+<div id="qrDataCard" class="card hidden">
+  <h2>Dados reconhecidos pelo QR</h2>
+  <div id="qrData"></div>
+</div>
+</div>
+
+<iframe name="submitFrame" style="display:none"></iframe>
 
 <script>
+(function(){
+"use strict";
 
-/* =========================================================
-   CONFIGURAÇÕES
-========================================================= */
+const BACKEND="https://script.google.com/macros/s/AKfycbxhKQA_ra_MJEkbyC-VF4raUzI2j-SWZVeu8QJDr0I5W-yq_9VsKOATjbO3x1STP9ro/exec";
+const params=new URLSearchParams(location.search);
+const secaoUrl=(params.get("secao")||"").padStart(3,"0");
 
-const BACKEND = "https://script.google.com/macros/s/AKfycbxhKQA_ra_MJEkbyC-VF4raUzI2j-SWZVeu8QJDr0I5W-yq_9VsKOATjbO3x1STP9ro/exec";
-
-
-const CANDIDATOS = {
-
-  FEDERAL:[
-    {
-      numero:"1011",
-      candidato:"Hugo Motta"
-    },
-    {
-      numero:"1044",
-      candidato:"Murilo Galdino"
-    }
-  ],
-
-  ESTADUAL:[
-    {
-      numero:"10111",
-      candidato:"Olivia Motta"
-    },
-    {
-      numero:"22333",
-      candidato:"Gesica de Laurindo"
-    }
-  ],
-
-  SENADOR:[
-    {
-      numero:"400",
-      candidato:"João Azevêdo"
-    },
-    {
-      numero:"100",
-      candidato:"Nabor"
-    },
-    {
-      numero:"155",
-      candidato:"Veneziano"
-    }
-  ],
-
-  GOVERNADOR:[
-    {
-      numero:"11",
-      candidato:"Lucas Ribeiro"
-    },
-    {
-      numero:"15",
-      candidato:"Cícero Lucena"
-    },
-    {
-      numero:"22",
-      candidato:"Efraim Filho"
-    }
-  ],
-
-  PRESIDENTE:[
-    {
-      numero:"13",
-      candidato:"Lula"
-    },
-    {
-      numero:"22",
-      candidato:"Flávio Bolsonaro"
-    }
-  ]
-
+const CANDIDATOS={
+ "DEPUTADO FEDERAL":[
+  {numero:"1011",nome:"Hugo Motta"},
+  {numero:"1044",nome:"Murilo Galdino"}
+ ],
+ "DEPUTADO ESTADUAL":[
+  {numero:"10111",nome:"Olivia Motta"},
+  {numero:"22333",nome:"Gesica de Laurindo"}
+ ],
+ "SENADOR":[
+  {numero:"400",nome:"João Azevêdo"},
+  {numero:"100",nome:"Nabor"},
+  {numero:"155",nome:"Veneziano"}
+ ],
+ "GOVERNADOR":[
+  {numero:"11",nome:"Lucas Ribeiro"},
+  {numero:"15",nome:"Cícero Lucena"},
+  {numero:"22",nome:"Efraim Filho"}
+ ],
+ "PRESIDENTE":[
+  {numero:"13",nome:"Lula"},
+  {numero:"22",nome:"Flávio Bolsonaro"}
+ ]
 };
 
+let scanner=null,parts={},parsed=null,qrReady=false,jsQRReady=false;
+const $=id=>document.getElementById(id);
+function msg(t,k){const e=$("msg");e.textContent=t;e.className="msg show "+(k||"");}
+function diag(t){$("diag").textContent=new Date().toLocaleTimeString()+" — "+t;}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 
-/* =========================================================
-   SEÇÕES
-========================================================= */
+$("secao").value=secaoUrl||"";
+$("secaoPill").textContent="Seção "+(secaoUrl||"—");
 
-const SECOES = [
+function loadScript(src,name,cb){
+ const s=document.createElement("script");s.src=src;s.async=true;
+ s.onload=()=>{diag(name+" carregado.");cb(true)};
+ s.onerror=()=>{diag("Falha ao carregar "+name+".");cb(false)};
+ document.head.appendChild(s);
+}
+loadScript("https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js","html5-qrcode",ok=>{qrReady=ok});
+loadScript("https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js","jsQR",ok=>{jsQRReady=ok});
 
-"1",
-"2",
-"3",
-"4",
-"5",
-"6",
-"7",
-"8",
-"9",
-"10",
-"11",
-"12",
-"13",
-"14",
-"15",
-"16",
-"17",
-"32",
-"33",
-"34",
-"137",
-"140",
-"143",
-"159",
-"161",
-"162",
-"163",
-"164",
-"175",
-"180",
-"506"
+function renderCandidateSections(){
+ const root=$("candidateSections"); root.innerHTML="";
+ Object.entries(CANDIDATOS).forEach(([cargo,lista])=>{
+   const box=document.createElement("div");
+   box.innerHTML="<h3>"+esc(cargo)+"</h3><div class='candidate-head'><span>NÚMERO</span><span>CANDIDATO</span><span>VOTOS</span></div>";
+   lista.forEach(c=>{
+     const row=document.createElement("div"); row.className="row";
+     row.innerHTML="<input value='"+esc(c.numero)+"' readonly><div class='name'>"+esc(c.nome)+"</div><input class='vote-input' type='number' min='0' data-cargo='"+esc(cargo)+"' data-tipo='CANDIDATO' data-numero='"+esc(c.numero)+"' data-candidato='"+esc(c.nome)+"' placeholder='0'>";
+     box.appendChild(row);
+   });
+   const other=document.createElement("div"); other.className="other"; other.dataset.cargo=cargo;
+   other.innerHTML="<button type='button' class='secondary addOther'>＋ Outro candidato</button><div class='otherRows'></div>";
+   box.appendChild(other);
+   other.querySelector(".addOther").onclick=()=>{
+     const r=document.createElement("div");r.className="row otherRow";
+     r.innerHTML="<input class='other-numero' type='text' inputmode='numeric' placeholder='Número'><input class='other-nome' type='text' placeholder='Nome do candidato'><input class='other-votos' type='number' min='0' placeholder='0'>";
+     other.querySelector(".otherRows").appendChild(r);
+   };
+   root.appendChild(box);
+ });
+}
+renderCandidateSections();
 
-];
-
-
-/* =========================================================
-   VARIÁVEIS
-========================================================= */
-
-let stream = null;
-
-let parsedQR = null;
-
-let qrParts = {};
-
-let manualRows = {
-
-  FEDERAL:[],
-  ESTADUAL:[],
-  SENADOR:[],
-  GOVERNADOR:[],
-  PRESIDENTE:[]
-
-};
-
-
-/* =========================================================
-   UTILITÁRIOS
-========================================================= */
-
-function $(id){
-
-  return document.getElementById(id);
-
+function clearAll(){
+ stopCamera(); parts={};parsed=null;
+ document.querySelectorAll("input").forEach(i=>{if(!i.readOnly && i.id!=="fileInput")i.value=""});
+ $("secao").value=secaoUrl||"";
+ $("candidateSections").querySelectorAll(".vote-input").forEach(i=>i.value="");
+ $("candidateSections").querySelectorAll(".otherRows").forEach(i=>i.innerHTML="");
+ $("qrDataCard").classList.add("hidden");
+ $("msg").className="msg"; $("diag").textContent="";
+ updateBalance();
 }
 
-
-function escapeHtml(value){
-
-  return String(value ?? "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-
+function updateBalance(){
+ const a=Number($("apto").value||0),c=Number($("comp").value||0),f=Number($("falt").value||0);
+ const ok=a===c+f;
+ $("balance").textContent="Aptos = Comparecimento + Faltosos: "+a+" = "+c+" + "+f+" "+(ok?"✓":"⚠ Não fecha");
+ $("balance").style.background=ok?"#dcfce7":"#fee2e2";
+ $("balance").style.color=ok?"#166534":"#991b1b";
 }
-
-
-function numero(value){
-
-  const n = Number(value);
-
-  return Number.isFinite(n) ? n : 0;
-
-}
-
-
-/* =========================================================
-   ABAS
-========================================================= */
-
-function mostrarAba(aba){
-
-  $("abaQr").classList.add("hidden");
-
-  $("abaManual").classList.add("hidden");
-
-  if(aba === "qr"){
-
-    $("abaQr").classList.remove("hidden");
-
-  }else{
-
-    $("abaManual").classList.remove("hidden");
-
-  }
-
-}
-
-
-/* =========================================================
-   SEÇÃO DA URL
-========================================================= */
-
-function obterSecaoURL(){
-
-  const params =
-    new URLSearchParams(window.location.search);
-
-  return params.get("secao") || "";
-
-}
-
-
-function configurarSecao(){
-
-  const secaoURL = obterSecaoURL();
-
-  const select = $("manualSecao");
-
-  select.innerHTML =
-    '<option value="">Selecione a seção</option>';
-
-  SECOES.forEach(secao => {
-
-    const option =
-      document.createElement("option");
-
-    option.value = secao;
-
-    option.textContent =
-      "Seção " + secao;
-
-    select.appendChild(option);
-
-  });
-
-  if(secaoURL){
-
-    select.value = secaoURL;
-
-    $("sectionInfo").innerHTML =
-
-      `<span class="section-badge">
-        Seção ${escapeHtml(secaoURL)}
-      </span>`;
-
-  }
-
-}
-
-
-/* =========================================================
-   CAMERA
-========================================================= */
-
-async function iniciarCamera(){
-
-  try{
-
-    pararCamera();
-
-    stream =
-      await navigator.mediaDevices.getUserMedia({
-
-        video:{
-          facingMode:{
-            ideal:"environment"
-          }
-        },
-
-        audio:false
-
-      });
-
-    $("video").srcObject = stream;
-
-    $("qrStatus").className =
-      "status info";
-
-    $("qrStatus").textContent =
-      "Câmera ativa. Aponte para o QR Code do BU.";
-
-    requestAnimationFrame(lerCamera);
-
-  }catch(error){
-
-    console.error(error);
-
-    $("qrStatus").className =
-      "status error";
-
-    $("qrStatus").textContent =
-      "Não foi possível acessar a câmera. Tente usar a opção de foto.";
-
-  }
-
-}
-
-
-function pararCamera(){
-
-  if(stream){
-
-    stream.getTracks().forEach(track => track.stop());
-
-    stream = null;
-
-  }
-
-}
-
-
-function lerCamera(){
-
-  if(!stream) return;
-
-  const video = $("video");
-
-  if(video.readyState >= 2){
-
-    const canvas = $("canvas");
-
-    canvas.width = video.videoWidth;
-
-    canvas.height = video.videoHeight;
-
-    const ctx = canvas.getContext("2d");
-
-    ctx.drawImage(
-      video,
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
-
-    const image =
-      ctx.getImageData(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
-
-    const code =
-      jsQR(
-        image.data,
-        image.width,
-        image.height,
-        {
-          inversionAttempts:"attemptBoth"
-        }
-      );
-
-    if(code){
-
-      onScan(code.data);
-
-      return;
-
-    }
-
-  }
-
-  requestAnimationFrame(lerCamera);
-
-}
-
-
-/* =========================================================
-   FOTO
-========================================================= */
-
-$("qrPhoto").addEventListener(
-  "change",
-  async function(event){
-
-    const file =
-      event.target.files[0];
-
-    if(!file) return;
-
-    try{
-
-      const image =
-        await carregarImagem(file);
-
-      const canvas = $("canvas");
-
-      canvas.width =
-        image.naturalWidth;
-
-      canvas.height =
-        image.naturalHeight;
-
-      const ctx =
-        canvas.getContext("2d");
-
-      ctx.drawImage(
-        image,
-        0,
-        0
-      );
-
-      const data =
-        ctx.getImageData(
-          0,
-          0,
-          canvas.width,
-          canvas.height
-        );
-
-      const code =
-        jsQR(
-          data.data,
-          data.width,
-          data.height,
-          {
-            inversionAttempts:"attemptBoth"
-          }
-        );
-
-      if(!code){
-
-        $("qrStatus").className =
-          "status error";
-
-        $("qrStatus").textContent =
-          "Não foi possível identificar o QR Code nesta imagem.";
-
-        return;
-
-      }
-
-      onScan(code.data);
-
-    }catch(error){
-
-      console.error(error);
-
-      $("qrStatus").className =
-        "status error";
-
-      $("qrStatus").textContent =
-        "Erro ao processar a imagem.";
-
-    }
-
-  }
-);
-
-
-function carregarImagem(file){
-
-  return new Promise((resolve,reject)=>{
-
-    const img =
-      new Image();
-
-    img.onload = () =>
-      resolve(img);
-
-    img.onerror = reject;
-
-    img.src =
-      URL.createObjectURL(file);
-
-  });
-
-}
-
-
-/* =========================================================
-   LEITURA QR
-========================================================= */
+["apto","comp","falt"].forEach(id=>$(id).addEventListener("input",updateBalance));
 
 function parseFields(text){
-
-  const result = {};
-
-  const regex =
-    /([A-Z][A-Z0-9]*):([A-Za-z0-9._-]+)/g;
-
-  let match;
-
-  while((match = regex.exec(text)) !== null){
-
-    result[match[1]] =
-      match[2];
-
-  }
-
-  return result;
-
+ const out={};
+ const re=/([A-Z][A-Z0-9]*):([^\s]+)/g; let m;
+ while((m=re.exec(text)))out[m[1]]=m[2];
+ return out;
 }
 
+function cargoNome(v){
+ const map={
+  "1":"DEPUTADO FEDERAL","2":"DEPUTADO ESTADUAL",
+  "3":"SENADOR","4":"GOVERNADOR","5":"PRESIDENTE"
+ };
+ return map[String(v)]||String(v||"");
+}
 
 function onScan(text){
-
-  console.log("QR:",text);
-
-  $("qrStatus").className =
-    "status info";
-
-  $("qrStatus").textContent =
-    "QR Code identificado. Processando...";
-
-  /*
-   * Formato esperado:
-   * QRBU:PARTE:TOTAL
-   */
-
-  const header =
-    text.match(/^QRBU:(\d+):(\d+)/);
-
-  if(!header){
-
-    $("qrStatus").className =
-      "status error";
-
-    $("qrStatus").textContent =
-      "QR Code não reconhecido como BU.";
-
-    return;
-
-  }
-
-  const parte =
-    Number(header[1]);
-
-  const total =
-    Number(header[2]);
-
-  if(!qrParts[total]){
-
-    qrParts = {};
-
-  }
-
-  qrParts[parte] =
-    text;
-
-  const recebidas =
-    Object.keys(qrParts).length;
-
-  $("qrStatus").textContent =
-    `QR ${recebidas} de ${total} recebido.`;
-
-  if(recebidas >= total){
-
-    const codes =
-      [];
-
-    for(let i=1;i<=total;i++){
-
-      if(!qrParts[i]){
-
-        $("qrStatus").className =
-          "status error";
-
-        $("qrStatus").textContent =
-          `Falta o QR ${i} de ${total}.`;
-
-        return;
-
-      }
-
-      codes.push(
-        qrParts[i]
-      );
-
-    }
-
-    try{
-
-      parsedQR =
-        parseQRs(codes);
-
-      renderQR(parsedQR);
-
-      pararCamera();
-
-    }catch(error){
-
-      console.error(error);
-
-      $("qrStatus").className =
-        "status error";
-
-      $("qrStatus").textContent =
-        error.message;
-
-    }
-
-  }
-
+ diag("Texto QR recebido: "+text.slice(0,500));
+ const m=text.match(/^QRBU:(\d+):(\d+)/);
+ if(!m){msg("QR detectado, mas não reconhecido como QRBU.","err");return}
+ const idx=Number(m[1]),total=Number(m[2]);
+ parts[idx]=text; msg("QR "+idx+" de "+total+" lido.","ok");
+ if(Object.keys(parts).length===total){
+   const codes=Object.keys(parts).sort((a,b)=>Number(a)-Number(b)).map(k=>parts[k]);
+   try{parsed=parseQRs(codes);fillFromParsed(parsed);stopCamera();msg("Todos os QR Codes foram lidos. Confira os dados.","ok")}
+   catch(e){msg(e.message||String(e),"err");diag("Erro de validação: "+(e.message||e))}
+ }
 }
-
-
-/* =========================================================
-   PARSER DO QR
-========================================================= */
 
 function parseQRs(codes){
-
-  const full =
-    codes.join(" ");
-
-  const fields =
-    parseFields(full);
-
-  const secao =
-    fields.SECA ||
-    fields.SECAO ||
-    "";
-
-  const idue =
-    fields.IDUE ||
-    "";
-
-  const zona =
-    fields.ZONA ||
-    "";
-
-  const municipio =
-    fields.MUNI ||
-    "";
-
-  const aptos =
-    numero(
-      fields.APTO
-    );
-
-  const comparecimento =
-    numero(
-      fields.COMP
-    );
-
-  const faltosos =
-    numero(
-      fields.FALT
-    );
-
-
-  const secaoURL =
-    obterSecaoURL();
-
-  if(
-    secaoURL &&
-    String(secao).replace(/^0+/,"") !==
-    String(secaoURL).replace(/^0+/,"")
-  ){
-
-    throw new Error(
-      `O QR pertence à seção ${secao}, mas esta página está configurada para a seção ${secaoURL}.`
-    );
-
-  }
-
-
-  if(
-    aptos &&
-    comparecimento +
-    faltosos !==
-    aptos
-  ){
-
-    throw new Error(
-      "Inconsistência no BU: Aptos diferente de Comparecimento + Faltosos."
-    );
-
-  }
-
-
-  const votos = [];
-
-
-  /*
-   * Procura blocos:
-   * CARG:...
-   * IDEL:...
-   * TIPO:...
-   * número:votos
-   *
-   * O parser permanece compatível com o formato
-   * atualmente utilizado no seu index.html.
-   */
-
-  const cargoMatches =
-    full.match(/CARG:[^ ]+/g) || [];
-
-
-  cargoMatches.forEach((cargoToken,index)=>{
-
-    const cargoCodigo =
-      cargoToken
-        .replace("CARG:","");
-
-    let cargo =
-      mapearCargo(cargoCodigo);
-
-    const inicio =
-      full.indexOf(
-        cargoToken
-      );
-
-    const fim =
-      index + 1 <
-      cargoMatches.length
-        ? full.indexOf(
-            cargoMatches[index+1]
-          )
-        : full.length;
-
-    const bloco =
-      full.substring(
-        inicio,
-        fim
-      );
-
-    const tipoMatch =
-      bloco.match(
-        /TIPO:([A-Za-z0-9._-]+)/
-      );
-
-    const tipo =
-      tipoMatch
-        ? tipoMatch[1]
-        : "CANDIDATO";
-
-
-    const tokens =
-      bloco.match(
-        /\b\d{1,6}:\d+\b/g
-      ) || [];
-
-
-    tokens.forEach(token=>{
-
-      const partes =
-        token.split(":");
-
-      if(partes.length !== 2)
-        return;
-
-      const numeroCandidato =
-        partes[0];
-
-      const qtd =
-        numero(
-          partes[1]
-        );
-
-      votos.push({
-
-        cargo: cargo,
-
-        tipo: tipo,
-
-        numero: numeroCandidato,
-
-        candidato:
-          "",
-
-        votos: qtd
-
-      });
-
-    });
-
-  });
-
-
-  return {
-
-    secao:String(secao),
-
-    idue:String(idue),
-
-    zona:String(zona),
-
-    municipio:String(municipio),
-
-    aptos:aptos,
-
-    comparecimento:comparecimento,
-
-    faltosos:faltosos,
-
-    validos:numero(fields.VALID),
-
-    brancos:numero(fields.BRAN),
-
-    nulos:numero(fields.NULO),
-
-    origem:"QR",
-
-    observacao:"",
-
-    votos:votos
-
-  };
-
+ const first=codes[0].match(/^QRBU:(\d+):(\d+)/);
+ if(!first)throw Error("QR inválido.");
+ const total=Number(first[2]);
+ if(codes.length!==total)throw Error("Faltam QR Codes. Esperados "+total+".");
+ let content="";
+ for(let i=0;i<codes.length;i++){
+   const h=codes[i].match(/^QRBU:(\d+):(\d+)/);
+   if(!h||Number(h[1])!==i+1||Number(h[2])!==total)throw Error("QR Codes fora de ordem.");
+   content+=(i?" ":"")+codes[i].replace(/^QRBU:\d+:\d+\s*/,"").trim();
+ }
+ const f=parseFields(content);
+ const p={
+  zona:f.ZONA||"",secao:f.SECA||"",municipio:f.MUNI||"",idue:f.IDUE||"",
+  apto:Number(f.APTO||0),comparecimento:Number(f.COMP||0),faltosos:Number(f.FALT||0),
+  qtdQr:total,rawQr:codes.join("\n"),votos:[]
+ };
+ if(p.secao&&secaoUrl&&p.secao.padStart(3,"0")!==secaoUrl)throw Error("QR indica seção "+p.secao+"; este link é da seção "+secaoUrl+".");
+ if(p.apto&&p.apto!==p.comparecimento+p.faltosos)throw Error("Aptos não fecham com comparecimento + faltosos.");
+ let cargo=null;
+ content.split(/\s+/).forEach(tok=>{
+   const kv=tok.match(/^([A-Z][A-Z0-9]*):(.+)$/);
+   if(kv){
+     const k=kv[1],v=kv[2];
+     if(k==="CARG")cargo={cargo:cargoNome(v),tipo:"CANDIDATO"};
+     else if(k==="TIPO"&&cargo)cargo.tipo=v;
+     return;
+   }
+   const cv=tok.match(/^(\d{1,6}):(\d+)$/);
+   if(cv&&cargo)p.votos.push({cargo:cargo.cargo,tipo:cargo.tipo||"CANDIDATO",numero:cv[1],candidato:"",votos:Number(cv[2])});
+ });
+ return p;
 }
 
-
-function mapearCargo(codigo){
-
-  const c =
-    String(codigo)
-      .toUpperCase();
-
-  const mapa = {
-
-    "FEDERAL":
-      "DEPUTADO FEDERAL",
-
-    "DF":
-      "DEPUTADO FEDERAL",
-
-    "ESTADUAL":
-      "DEPUTADO ESTADUAL",
-
-    "DE":
-      "DEPUTADO ESTADUAL",
-
-    "SEN":
-      "SENADOR",
-
-    "SENADOR":
-      "SENADOR",
-
-    "GOV":
-      "GOVERNADOR",
-
-    "GOVERNADOR":
-      "GOVERNADOR",
-
-    "PRE":
-      "PRESIDENTE",
-
-    "PRESIDENTE":
-      "PRESIDENTE"
-
-  };
-
-  return mapa[c] || codigo;
-
+function fillFromParsed(p){
+ $("secao").value=p.secao||$("secao").value;
+ $("idue").value=p.idue||"";
+ $("zona").value=p.zona||"";
+ $("municipio").value=p.municipio||"";
+ $("apto").value=p.apto||"";
+ $("comp").value=p.comparecimento||"";
+ $("falt").value=p.faltosos||"";
+ updateBalance();
+ if(p.votos.length){
+   p.votos.forEach(v=>{
+     let found=document.querySelector(".vote-input[data-cargo='"+CSS.escape(v.cargo)+"'][data-numero='"+CSS.escape(v.numero)+"']");
+     if(found)found.value=v.votos;
+   });
+ }
+ $("qrData").innerHTML="<div><b>Seção:</b> "+esc(p.secao)+" &nbsp; <b>IDUE:</b> "+esc(p.idue)+" &nbsp; <b>QR:</b> "+p.qtdQr+"</div>";
+ $("qrDataCard").classList.remove("hidden");
+ $("origem").value="QR";
 }
 
-
-/* =========================================================
-   RENDER QR
-========================================================= */
-
-function renderQR(data){
-
-  $("qrResult")
-    .classList
-    .remove("hidden");
-
-
-  $("qrData").innerHTML = `
-
-    <div class="summary">
-
-      <div>
-        <span>Seção</span>
-        <strong>${escapeHtml(data.secao)}</strong>
-      </div>
-
-      <div>
-        <span>IDUE</span>
-        <strong>${escapeHtml(data.idue)}</strong>
-      </div>
-
-      <div>
-        <span>Aptos</span>
-        <strong>${data.aptos}</strong>
-      </div>
-
-      <div>
-        <span>Comparecimento</span>
-        <strong>${data.comparecimento}</strong>
-      </div>
-
-      <div>
-        <span>Faltosos</span>
-        <strong>${data.faltosos}</strong>
-      </div>
-
-      <div>
-        <span>Válidos</span>
-        <strong>${data.validos}</strong>
-      </div>
-
-      <div>
-        <span>Brancos</span>
-        <strong>${data.brancos}</strong>
-      </div>
-
-      <div>
-        <span>Nulos</span>
-        <strong>${data.nulos}</strong>
-      </div>
-
-    </div>
-
-    <hr>
-
-    <h3>Votos identificados</h3>
-
-    ${
-      data.votos.length
-      ?
-      `<ul>
-        ${
-          data.votos.map(v =>
-            `<li>
-              ${escapeHtml(v.cargo)}
-              —
-              ${escapeHtml(v.numero)}
-              —
-              ${v.votos} votos
-            </li>`
-          ).join("")
-        }
-      </ul>`
-      :
-      `<p class="small">
-        Nenhum voto foi identificado automaticamente.
-      </p>`
-    }
-
-  `;
-
-
-  $("qrStatus").className =
-    "status success";
-
-  $("qrStatus").textContent =
-    "BU processado. Confira os dados antes de enviar.";
-
+async function startCamera(){
+ if(!qrReady||!window.Html5Qrcode){msg("Leitor de câmera ainda está carregando.","err");return}
+ stopCamera(); parts={};
+ scanner=new Html5Qrcode("reader");
+ try{
+  await scanner.start({facingMode:"environment"},{fps:10,qrbox:{width:280,height:280}},text=>onScan(text),()=>{});
+  msg("Câmera iniciada. Aponte para o QR do BU.","ok");
+ }catch(e){msg("Não foi possível iniciar a câmera: "+e,"err");}
+}
+async function stopCamera(){
+ if(scanner){try{await scanner.stop();}catch(e){}try{scanner.clear();}catch(e){}scanner=null}
 }
 
-
-/* =========================================================
-   ENVIO QR
-========================================================= */
-
-async function enviarDadosQR(){
-
-  if(!parsedQR){
-
-    alert(
-      "Nenhum BU foi processado."
-    );
-
-    return;
-
+function canvasVariants(img){
+ const list=[];
+ function add(name,crop,mode){
+  const c=document.createElement("canvas");
+  c.width=Math.max(1,Math.floor(img.naturalWidth*crop.w));
+  c.height=Math.max(1,Math.floor(img.naturalHeight*crop.h));
+  const ctx=c.getContext("2d",{willReadFrequently:true});
+  ctx.drawImage(img,img.naturalWidth*crop.x,img.naturalHeight*crop.y,img.naturalWidth*crop.w,img.naturalHeight*crop.h,0,0,c.width,c.height);
+  if(mode==="gray"||mode==="bw"){
+   const d=ctx.getImageData(0,0,c.width,c.height),a=d.data;
+   for(let i=0;i<a.length;i+=4){let y=.299*a[i]+.587*a[i+1]+.114*a[i+2];if(mode==="bw")y=y>150?255:0;a[i]=a[i+1]=a[i+2]=y}
+   ctx.putImageData(d,0,0);
   }
+  list.push({name,canvas:c});
+ }
+ add("original",{x:0,y:0,w:1,h:1},"gray");
+ add("center",{x:.11,y:.11,w:.78,h:.78},"gray");
+ add("center-bw",{x:.11,y:.11,w:.78,h:.78},"bw");
+ add("full-bw",{x:0,y:0,w:1,h:1},"bw");
+ return list;
+}
 
-  const payload =
-    Object.assign(
-      {},
-      parsedQR,
-      {
-        responsavel:
-          $("manualResponsavel")?.value || "",
-
-        observacao:
-          $("manualObservacao")?.value || ""
-      }
-    );
-
-
-  $("qrStatus").className =
-    "status info";
-
-  $("qrStatus").textContent =
-    "Enviando BU...";
-
-
+async function scanPhoto(file){
+ if(!file)return;
+ if(!jsQRReady||!window.jsQR){msg("Leitor de foto ainda está carregando.","err");return}
+ const url=URL.createObjectURL(file),img=new Image();
+ img.onload=async()=>{
+  $("preview").src=url;$("preview").style.display="block";
   try{
-
-    const resposta =
-      await enviarBackend(payload);
-
-    $("qrStatus").className =
-      resposta.sucesso
-      ? "status success"
-      : "status error";
-
-    $("qrStatus").textContent =
-      resposta.mensagem ||
-      "Resposta recebida.";
-
-  }catch(error){
-
-    console.error(error);
-
-    $("qrStatus").className =
-      "status error";
-
-    $("qrStatus").textContent =
-      "Erro ao enviar: " +
-      error.message;
-
-  }
-
+   for(const v of canvasVariants(img)){
+    const ctx=v.canvas.getContext("2d",{willReadFrequently:true});
+    const data=ctx.getImageData(0,0,v.canvas.width,v.canvas.height);
+    const code=window.jsQR(data.data,data.width,data.height,{inversionAttempts:"attemptBoth"});
+    if(code&&code.data){msg("QR encontrado. Conferindo dados…","ok");onScan(code.data);URL.revokeObjectURL(url);return}
+   }
+   msg("A foto foi aberta, mas o QR não foi decodificado. Tente uma foto mais próxima e sem reflexos.","err");
+  }catch(e){msg("Erro ao processar a foto: "+e,"err")}
+ };
+ img.onerror=()=>msg("Não consegui abrir a foto selecionada.","err");
+ img.src=url;
 }
 
-
-/* =========================================================
-   CANDIDATOS MANUAIS
-========================================================= */
-
-function criarLinhaVoto(
-  cargo,
-  candidato = "",
-  numeroCandidato = "",
-  tipo = "CANDIDATO"
-){
-
-  const container =
-    document.createElement("div");
-
-  container.className =
-    "vote-row";
-
-
-  const numeroInput =
-    document.createElement("input");
-
-  numeroInput.type =
-    "text";
-
-  numeroInput.inputMode =
-    "numeric";
-
-  numeroInput.placeholder =
-    "Número";
-
-  numeroInput.value =
-    numeroCandidato;
-
-
-  const nomeInput =
-    document.createElement("input");
-
-  nomeInput.type =
-    "text";
-
-  nomeInput.placeholder =
-    "Nome do candidato / legenda";
-
-  nomeInput.value =
-    candidato;
-
-
-  const votosInput =
-    document.createElement("input");
-
-  votosInput.type =
-    "number";
-
-  votosInput.min =
-    "0";
-
-  votosInput.placeholder =
-    "Votos";
-
-
-  const remove =
-    document.createElement("button");
-
-  remove.type =
-    "button";
-
-  remove.className =
-    "remove-btn";
-
-  remove.textContent =
-    "×";
-
-  remove.onclick =
-    () => {
-
-      container.remove();
-
-    };
-
-
-  container.appendChild(
-    numeroInput
-  );
-
-  container.appendChild(
-    nomeInput
-  );
-
-  container.appendChild(
-    votosInput
-  );
-
-  container.appendChild(
-    remove
-  );
-
-
-  const wrapper =
-    document.createElement("div");
-
-  wrapper.dataset.cargo =
-    cargo;
-
-  wrapper.dataset.tipo =
-    tipo;
-
-  wrapper.appendChild(
-    container
-  );
-
-
-  return wrapper;
-
+function collectVotes(){
+ const votos=[];
+ document.querySelectorAll(".vote-input").forEach(i=>{
+   const n=Number(i.value||0);
+   if(n>0)votos.push({cargo:i.dataset.cargo,tipo:"CANDIDATO",numero:i.dataset.numero,candidato:i.dataset.candidato,votos:n});
+ });
+ document.querySelectorAll(".otherRow").forEach(r=>{
+   const numero=r.querySelector(".other-numero").value.trim();
+   const nome=r.querySelector(".other-nome").value.trim();
+   const votosN=Number(r.querySelector(".other-votos").value||0);
+   if(numero||nome||votosN>0){
+     if(!numero||!nome)throw Error("Preencha número e nome do outro candidato.");
+     votos.push({cargo:r.closest(".other").dataset.cargo,tipo:"CANDIDATO",numero,candidato:nome,votos:votosN});
+   }
+ });
+ return votos;
 }
 
-
-function adicionarCandidatoDestacado(
-  cargo,
-  numeroCandidato,
-  candidato
-){
-
-  const container =
-    $(cargo.toLowerCase() + "Rows");
-
-
-  const wrapper =
-    criarLinhaVoto(
-      cargo,
-      candidato,
-      numeroCandidato,
-      "CANDIDATO"
-    );
-
-  container.appendChild(
-    wrapper
-  );
-
+function submitPayload(payload){
+ const form=document.createElement("form");
+ form.method="POST";form.action=BACKEND;form.target="submitFrame";form.style.display="none";
+ const input=document.createElement("input");input.type="hidden";input.name="payload";input.value=JSON.stringify(payload);
+ form.appendChild(input);document.body.appendChild(form);form.submit();
+ setTimeout(()=>form.remove(),1000);
 }
 
-
-function adicionarVoto(cargo){
-
-  const container =
-    $(cargo.toLowerCase() + "Rows");
-
-
-  const wrapper =
-    criarLinhaVoto(
-      cargo,
-      "",
-      "",
-      "CANDIDATO"
-    );
-
-  container.appendChild(
-    wrapper
-  );
-
-}
-
-
-/* =========================================================
-   INICIALIZA CANDIDATOS
-========================================================= */
-
-function inicializarCandidatos(){
-
-  Object.keys(CANDIDATOS)
-    .forEach(cargo=>{
-
-      CANDIDATOS[cargo]
-        .forEach(candidato=>{
-
-          adicionarCandidatoDestacado(
-            cargo,
-            candidato.numero,
-            candidato.candidato
-          );
-
-        });
-
-    });
-
-}
-
-
-/* =========================================================
-   COLETAR VOTOS MANUAIS
-========================================================= */
-
-function coletarVotosManuais(){
-
-  const votos = [];
-
-
-  Object.keys(manualRows)
-    .forEach(()=>{});
-
-
-  const cargos = [
-
-    {
-      key:"FEDERAL",
-      id:"federalRows",
-      nome:"DEPUTADO FEDERAL"
-    },
-
-    {
-      key:"ESTADUAL",
-      id:"estadualRows",
-      nome:"DEPUTADO ESTADUAL"
-    },
-
-    {
-      key:"SENADOR",
-      id:"senadorRows",
-      nome:"SENADOR"
-    },
-
-    {
-      key:"GOVERNADOR",
-      id:"governadorRows",
-      nome:"GOVERNADOR"
-    },
-
-    {
-      key:"PRESIDENTE",
-      id:"presidenteRows",
-      nome:"PRESIDENTE"
-    }
-
-  ];
-
-
-  cargos.forEach(cargo=>{
-
-    const container =
-      $(cargo.id);
-
-    const rows =
-      container.querySelectorAll(
-        ".vote-row"
-      );
-
-
-    rows.forEach(row=>{
-
-      const inputs =
-        row.querySelectorAll("input");
-
-      if(inputs.length < 3)
-        return;
-
-      const numero =
-        inputs[0].value.trim();
-
-      const candidato =
-        inputs[1].value.trim();
-
-      const qtd =
-        numeroValue(
-          inputs[2].value
-        );
-
-
-      if(
-        !numero &&
-        !candidato &&
-        !qtd
-      ){
-
-        return;
-
-      }
-
-
-      votos.push({
-
-        cargo:cargo.nome,
-
-        tipo:
-          numero
-          ? "CANDIDATO"
-          : "LEGENDA",
-
-        numero:numero,
-
-        candidato:candidato,
-
-        votos:qtd
-
-      });
-
-    });
-
-  });
-
-
-  const branco =
-    numeroValue(
-      $("manualBrancoVotos").value
-    );
-
-  if(branco > 0){
-
-    votos.push({
-
-      cargo:"BRANCO",
-
-      tipo:"BRANCO",
-
-      numero:"",
-
-      candidato:"",
-
-      votos:branco
-
-    });
-
-  }
-
-
-  const nulo =
-    numeroValue(
-      $("manualNuloVotos").value
-    );
-
-  if(nulo > 0){
-
-    votos.push({
-
-      cargo:"NULO",
-
-      tipo:"NULO",
-
-      numero:"",
-
-      candidato:"",
-
-      votos:nulo
-
-    });
-
-  }
-
-
-  return votos;
-
-}
-
-
-function numeroValue(value){
-
-  const n =
-    parseInt(
-      value,
-      10
-    );
-
-  return Number.isFinite(n)
-    ? n
-    : 0;
-
-}
-
-
-/* =========================================================
-   VALIDAÇÃO MANUAL
-========================================================= */
-
-function validarManual(){
-
-  const aptos =
-    numeroValue(
-      $("manualAptos").value
-    );
-
-  const comparecimento =
-    numeroValue(
-      $("manualComparecimento").value
-    );
-
-  const faltosos =
-    numeroValue(
-      $("manualFaltosos").value
-    );
-
-
-  if(
-    !aptos &&
-    !comparecimento &&
-    !faltosos
-  ){
-
-    $("manualValidation").className =
-      "status info";
-
-    $("manualValidation").textContent =
-      "Preencha os dados gerais.";
-
-    return false;
-
-  }
-
-
-  if(
-    comparecimento +
-    faltosos !==
-    aptos
-  ){
-
-    $("manualValidation").className =
-      "status error";
-
-    $("manualValidation").textContent =
-      `Erro: ${comparecimento} + ${faltosos} = ${
-        comparecimento + faltosos
-      }, mas Aptos = ${aptos}.`;
-
-    return false;
-
-  }
-
-
-  $("manualValidation").className =
-    "status success";
-
-  $("manualValidation").textContent =
-    "✓ Aptos = Comparecimento + Faltosos.";
-
-  return true;
-
-}
-
-
-/* =========================================================
-   ENVIO MANUAL
-========================================================= */
-
-async function enviarManual(){
-
-  const secao =
-    $("manualSecao").value.trim();
-
-  const idue =
-    $("manualIdue").value.trim();
-
-
-  if(!secao){
-
-    alert(
-      "Selecione a seção."
-    );
-
-    return;
-
-  }
-
-
-  if(!idue){
-
-    alert(
-      "Informe o IDUE."
-    );
-
-    return;
-
-  }
-
-
-  if(!validarManual()){
-
-    alert(
-      "Corrija os dados gerais antes de enviar."
-    );
-
-    return;
-
-  }
-
-
-  const aptos =
-    numeroValue(
-      $("manualAptos").value
-    );
-
-  const comparecimento =
-    numeroValue(
-      $("manualComparecimento").value
-    );
-
-  const faltosos =
-    numeroValue(
-      $("manualFaltosos").value
-    );
-
-  const validos =
-    numeroValue(
-      $("manualValidos").value
-    );
-
-  const brancos =
-    numeroValue(
-      $("manualBrancos").value
-    );
-
-  const nulos =
-    numeroValue(
-      $("manualNulos").value
-    );
-
-
-  const votos =
-    coletarVotosManuais();
-
-
-  if(!votos.length){
-
-    alert(
-      "Informe pelo menos um voto antes de enviar."
-    );
-
-    return;
-
-  }
-
-
-  const payload = {
-
-    secao:secao,
-
-    idue:idue,
-
-    zona:
-      $("manualZona").value.trim(),
-
-    municipio:
-      $("manualMunicipio").value.trim(),
-
-    aptos:aptos,
-
-    comparecimento:
-      comparecimento,
-
-    faltosos:
-      faltosos,
-
-    validos:
-      validos,
-
-    brancos:
-      brancos,
-
-    nulos:
-      nulos,
-
-    origem:"MANUAL",
-
-    observacao:
-      $("manualObservacao").value.trim(),
-
-    responsavel:
-      $("manualResponsavel").value.trim(),
-
-    votos:votos
-
+$("send").onclick=()=>{
+ try{
+  const secao=$("secao").value.trim(),idue=$("idue").value.trim();
+  const apto=Number($("apto").value||0),comp=Number($("comp").value||0),falt=Number($("falt").value||0);
+  if(!secao||!idue)throw Error("Informe seção e IDUE.");
+  if(apto!==comp+falt)throw Error("Aptos deve ser igual a Comparecimento + Faltosos.");
+  const payload={
+   secao, idue, aptos:apto, comparecimento:comp, faltosos:falt,
+   validos:Number($("validos").value||0), brancos:Number($("brancos").value||0),
+   nulos:Number($("nulos").value||0), origem:$("origem").value,
+   observacao:$("obs").value.trim(),
+   responsavel:$("responsavel").value.trim(),
+   votos:collectVotes()
   };
+  if(!payload.votos.length)throw Error("Informe pelo menos um voto.");
+  submitPayload(payload);
+  msg("Lançamento enviado para conferência.","ok");
+ }catch(e){msg(e.message||String(e),"err")}
+};
 
+$("start").onclick=startCamera;
+$("stop").onclick=stopCamera;
+$("clear").onclick=clearAll;
+$("fileBtn").onclick=()=>$("fileInput").click();
+$("fileInput").onchange=e=>{scanPhoto(e.target.files[0]);e.target.value=""};
+$("manualBtn").onclick=()=>{
+ $("origem").value="MANUAL";
+ $("manualCard").scrollIntoView({behavior:"smooth"});
+ msg("Modo manual selecionado. Preencha somente os campos necessários.","info");
+};
 
-  const botao =
-    $("btnEnviarManual");
-
-  botao.disabled =
-    true;
-
-  $("manualSendStatus").className =
-    "status info";
-
-  $("manualSendStatus").textContent =
-    "Enviando lançamento manual...";
-
-
-  try{
-
-    const resposta =
-      await enviarBackend(payload);
-
-
-    if(resposta.sucesso){
-
-      $("manualSendStatus").className =
-        "status success";
-
-      $("manualSendStatus").textContent =
-        resposta.mensagem ||
-        "Lançamento enviado com sucesso.";
-
-      /*
-       * Não limpa automaticamente os campos.
-       * Isso permite conferir os dados enviados.
-       */
-
-    }else{
-
-      $("manualSendStatus").className =
-        "status error";
-
-      $("manualSendStatus").textContent =
-        resposta.mensagem ||
-        "O backend recusou o lançamento.";
-
-    }
-
-
-  }catch(error){
-
-    console.error(error);
-
-    $("manualSendStatus").className =
-      "status error";
-
-    $("manualSendStatus").textContent =
-      "Erro ao enviar: " +
-      error.message;
-
-  }finally{
-
-    botao.disabled =
-      false;
-
-  }
-
-}
-
-
-/* =========================================================
-   ENVIO AO BACKEND
-========================================================= */
-
-async function enviarBackend(payload){
-
-  const form =
-    new URLSearchParams();
-
-  form.append(
-    "payload",
-    JSON.stringify(payload)
-  );
-
-
-  const response =
-    await fetch(
-      BACKEND,
-      {
-        method:"POST",
-
-        headers:{
-          "Content-Type":
-            "application/x-www-form-urlencoded;charset=UTF-8"
-        },
-
-        body:form.toString()
-
-      }
-    );
-
-
-  if(!response.ok){
-
-    throw new Error(
-      "HTTP " +
-      response.status
-    );
-
-  }
-
-
-  const text =
-    await response.text();
-
-
-  try{
-
-    return JSON.parse(text);
-
-  }catch(error){
-
-    console.error(
-      "Resposta do backend:",
-      text
-    );
-
-    throw new Error(
-      "O backend retornou uma resposta que não é JSON."
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   INICIALIZAÇÃO
-========================================================= */
-
-document.addEventListener(
-  "DOMContentLoaded",
-  function(){
-
-    configurarSecao();
-
-    inicializarCandidatos();
-
-    mostrarAba("qr");
-
-  }
-);
-
+updateBalance();
+diag("Sistema carregado.");
+})();
 </script>
-
 </body>
 </html>
