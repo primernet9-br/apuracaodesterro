@@ -77,7 +77,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:7px;borde
 </div>
 
 <script>
-const BACKEND = "%%BACKEND_URL%%";
+const BACKEND = "https://script.google.com/macros/s/AKfycbwmaw96kv-LeWk3znO_F4B2Wky8PXxYcFvXYmwLN3R2TZEnv1SYeP1WmXxJmvaMFhM/exec";
 const params = new URLSearchParams(location.search);
 const secaoUrl = (params.get("secao")||"").padStart(3,"0");
 document.getElementById("secaoPill").textContent = "Seção " + (secaoUrl||"—");
