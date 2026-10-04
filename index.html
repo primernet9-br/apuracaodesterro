@@ -359,38 +359,65 @@ function canvasVariants(img){
 
 async function scanPhoto(file){
  if(!file)return;
- if(!jsQRReady||!window.jsQR){msg("Leitor de foto ainda está carregando.","err");return}
  msg("Processando a foto do QR Code…","info");
- const reader=new FileReader();
- reader.onload=()=>{
-  const img=new Image();
-  img.onload=()=>{
+ diag("Abrindo foto: "+file.name);
+
+ // Primeiro usa o leitor html5-qrcode, que possui suporte próprio para
+ // arquivos de imagem e costuma funcionar melhor que decodificar o canvas manualmente.
+ if(qrReady && window.Html5Qrcode){
    try{
-    $("preview").src=reader.result;
-    $("preview").style.display="block";
-    const variants=canvasVariants(img);
-    for(const v of variants){
-     const ctx=v.canvas.getContext("2d",{willReadFrequently:true});
-     const data=ctx.getImageData(0,0,v.canvas.width,v.canvas.height);
-     const code=window.jsQR(data.data,data.width,data.height,{inversionAttempts:"attemptBoth"});
-     if(code&&code.data){
-      msg("QR encontrado. Conferindo dados…","ok");
-      onScan(code.data);
-      return;
-     }
-    }
-    msg("A foto foi aberta, mas o QR não foi decodificado. Tente uma foto mais próxima e sem reflexos.","err");
+     if(scanner){await stopCamera();}
+     scanner=new Html5Qrcode("reader");
+     const text=await scanner.scanFile(file,true);
+     diag("QR encontrado na foto.");
+     onScan(text);
+     try{await scanner.clear();}catch(e){}
+     scanner=null;
+     return;
    }catch(e){
-    msg("Erro ao processar a foto: "+(e.message||e),"err");
-    diag("Erro ao processar foto: "+(e.stack||e));
+     try{if(scanner){await scanner.clear();}}catch(_){}
+     scanner=null;
+     diag("html5-qrcode não decodificou; tentando leitor alternativo.");
    }
-  };
-  img.onerror=()=>msg("Não consegui abrir a foto selecionada.","err");
-  img.src=reader.result;
- };
- reader.onerror=()=>msg("Não consegui ler o arquivo de imagem.","err");
- reader.readAsDataURL(file);
+ }
+
+ // Fallback com jsQR.
+ if(jsQRReady && window.jsQR){
+   const reader=new FileReader();
+   reader.onload=()=>{
+     const img=new Image();
+     img.onload=()=>{
+       try{
+         $("preview").src=reader.result;
+         $("preview").style.display="block";
+         const variants=canvasVariants(img);
+         for(const v of variants){
+           const ctx=v.canvas.getContext("2d",{willReadFrequently:true});
+           const data=ctx.getImageData(0,0,v.canvas.width,v.canvas.height);
+           const code=window.jsQR(data.data,data.width,data.height,{inversionAttempts:"attemptBoth"});
+           if(code&&code.data){
+             diag("QR encontrado pelo leitor alternativo.");
+             onScan(code.data);
+             return;
+           }
+         }
+         msg("A foto foi aberta, mas o QR não foi decodificado. Tente uma foto mais próxima e sem reflexos.","err");
+       }catch(e){
+         msg("Erro ao processar a foto: "+(e.message||e),"err");
+         diag("Erro ao processar foto: "+(e.stack||e));
+       }
+     };
+     img.onerror=()=>msg("Não consegui abrir a foto selecionada.","err");
+     img.src=reader.result;
+   };
+   reader.onerror=()=>msg("Não consegui ler o arquivo de imagem.","err");
+   reader.readAsDataURL(file);
+   return;
+ }
+
+ msg("Os leitores de QR ainda estão carregando. Aguarde alguns segundos e selecione a foto novamente.","err");
 }
+
 function collectVotes(){
  const votos=[];
  document.querySelectorAll(".vote-input").forEach(i=>{
@@ -466,7 +493,12 @@ $("tabManual").onclick=()=>{
 $("start").onclick=startCamera;
 $("stop").onclick=stopCamera;
 $("clear").onclick=clearAll;
-$("fileInput").onchange=e=>{scanPhoto(e.target.files[0]);e.target.value=""};
+$("fileInput").onchange=async e=>{
+ const file=e.target.files && e.target.files[0];
+ if(!file)return;
+ await scanPhoto(file);
+ e.target.value="";
+};
 
 
 updateBalance();
