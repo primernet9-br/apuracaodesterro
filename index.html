@@ -3,731 +3,274 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Apuração Desterro 2026</title>
+<title>Apuração Desterro 2026 — Leitor de BU</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f3f4f6;color:#111827}
-.wrap{max-width:920px;margin:auto;padding:16px}
-header{background:#111827;color:#fff;border-radius:16px;padding:18px;margin-bottom:14px}
-h1{margin:0 0 5px;font-size:23px}.sub{opacity:.82;font-size:13px}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f3f4f6;color:#111827}
+.wrap{max-width:980px;margin:auto;padding:16px}.head{background:#111827;color:#fff;border-radius:16px;padding:20px;margin-bottom:14px}
+h1{margin:0 0 5px;font-size:23px}.sub{opacity:.82;font-size:14px}
 .card{background:#fff;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 2px 10px #0000000d}
-h2{font-size:18px;margin:0 0 12px}
-h3{font-size:15px;margin:16px 0 8px;border-bottom:1px solid #e5e7eb;padding-bottom:7px}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-label{display:block;font-size:13px;font-weight:700;color:#374151}
-input,select,textarea{width:100%;margin-top:5px;padding:11px;border:1px solid #d1d5db;border-radius:10px;font-size:15px;background:#fff}
-input[readonly]{background:#f3f4f6}
-textarea{min-height:80px;resize:vertical}
+h2{font-size:18px;margin:0 0 12px}h3{font-size:15px;margin:16px 0 8px}
 button{border:0;border-radius:10px;padding:12px 15px;font-weight:700;cursor:pointer}
-button:disabled{opacity:.55;cursor:not-allowed}
-.primary{background:#111827;color:#fff}.secondary{background:#e5e7eb;color:#111827}
-.success{background:#166534;color:#fff}.danger{background:#b91c1c;color:#fff}
-.msg{padding:12px;border-radius:10px;margin:10px 0;font-weight:700;display:none}
-.msg.show{display:block}.ok{background:#dcfce7;color:#166534}.err{background:#fee2e2;color:#991b1b}.info{background:#e0f2fe;color:#075985}
-.hidden{display:none!important}
-#reader{width:100%;height:170px;background:#111827;border-radius:12px;margin:10px 0;overflow:hidden}
-.preview{max-width:100%;max-height:360px;display:none;border-radius:12px;margin-top:10px}
-.diag{font-family:ui-monospace,monospace;font-size:11px;white-space:pre-wrap;background:#0f172a;color:#e2e8f0;padding:10px;border-radius:10px;overflow:auto;max-height:180px}
-.summary{background:#f8fafc;border:1px solid #e5e7eb;padding:11px;border-radius:10px;font-size:13px}
-.vote-table{width:100%;border-collapse:collapse;font-size:13px}
-.vote-table th,.vote-table td{border-bottom:1px solid #e5e7eb;padding:7px;text-align:left}
-.vote-table th{font-size:11px;color:#6b7280}
-.row{display:grid;grid-template-columns:100px 1fr 110px;gap:8px;align-items:end;margin-bottom:8px}
-.row .name{font-size:14px;font-weight:700;padding:11px 0}
-.candidate-head{display:grid;grid-template-columns:100px 1fr 110px;gap:8px;font-size:11px;color:#6b7280;font-weight:700;margin-bottom:4px}
-.other{background:#f9fafb;border:1px solid #e5e7eb;padding:10px;border-radius:10px;margin-top:8px}
-.status-line{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
-.pill{background:#e5e7eb;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700}
-.pill.ok{background:#dcfce7;color:#166534}
-.sendbox{border:2px solid #166534;background:#f0fdf4}
-@media(max-width:650px){.grid,.grid3{grid-template-columns:1fr}.row,.candidate-head{grid-template-columns:80px 1fr 90px}}
+.primary{background:#111827;color:#fff}.secondary{background:#e5e7eb;color:#111827}.success{background:#166534;color:#fff}.danger{background:#b91c1c;color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+.tabs{display:flex;gap:7px;margin-bottom:12px}.tabs button{flex:1}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+label{font-size:12px;font-weight:700;color:#374151}input,select,textarea{width:100%;margin-top:4px;padding:10px;border:1px solid #d1d5db;border-radius:9px;font-size:15px}
+textarea{min-height:70px}.hidden{display:none!important}
+#reader{min-height:260px;background:#111827;border-radius:12px;overflow:hidden;margin:10px 0}
+.preview{max-width:100%;max-height:400px;display:none;margin-top:10px;border-radius:12px}
+.msg{padding:11px;border-radius:10px;margin:9px 0;font-weight:700;display:none}.msg.show{display:block}
+.ok{background:#dcfce7;color:#166534}.err{background:#fee2e2;color:#991b1b}.info{background:#e0f2fe;color:#075985}.warn{background:#fef3c7;color:#92400e}
+.diag{font:12px/1.4 monospace;color:#4b5563;background:#f9fafb;padding:10px;border-radius:9px;white-space:pre-wrap;word-break:break-word}
+.summary{background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:11px;margin-top:10px}
+.cargo{border:1px solid #e5e7eb;border-radius:12px;margin:10px 0;overflow:hidden}.cargo h4{margin:0;padding:10px;background:#f9fafb;font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:7px;border-bottom:1px solid #eee;text-align:left}th:last-child,td:last-child{text-align:right}
+.badge{display:inline-block;background:#e5e7eb;border-radius:999px;padding:4px 8px;font-size:11px}
+.note{font-size:12px;color:#6b7280}.check{padding:10px;border-radius:9px;margin-top:9px}
 </style>
 </head>
 <body>
 <div class="wrap">
-<header>
-  <h1>APURAÇÃO DESTERRO 2026</h1>
-  <div class="sub">Sistema de recebimento e lançamento de Boletins de Urna</div>
-</header>
+<div class="head"><h1>APURAÇÃO DESTERRO 2026</h1><div class="sub">Recebimento e conferência de Boletins de Urna</div></div>
 
-<div style="display:flex;gap:6px;margin-bottom:12px">
-  <button id="tabQr" class="primary" style="flex:1">📷 Ler QR Code</button>
-  <button id="tabManual" class="secondary" style="flex:1">✍️ Lançamento Manual</button>
+<div class="tabs">
+<button id="tabQr" class="primary">📷 Ler QR Code</button>
+<button id="tabManual" class="secondary">✍️ Lançamento Manual</button>
 </div>
 
-<!-- ===================== QR ===================== -->
-<div id="qrScreen">
-  <div class="card">
-    <h2>📷 Receber Boletim de Urna por QR Code</h2>
-    <div class="summary">Leia o QR pela câmera ou selecione uma foto. Depois da leitura, o sistema mostra os dados reconhecidos e libera o botão <b>Enviar para conferência</b>.</div>
-    <div id="reader"></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button id="start" class="primary" style="flex:1">📷 Iniciar câmera</button>
-      <button id="stop" class="secondary" style="flex:1">⏹️ Parar câmera</button>
-      <button id="clearQr" class="secondary" style="flex:1">🧹 Limpar</button>
-    </div>
-    <label style="margin-top:8px">Ou selecione uma foto do QR Code
-      <input id="fileInput" type="file" accept="image/*" capture="environment">
-    </label>
-    <img id="preview" class="preview">
-    <div id="msg" class="msg"></div>
-    <div id="diag" class="diag" style="margin-top:8px">Aguardando leitura do QR Code.</div>
-  </div>
-
-  <div id="qrDataCard" class="card hidden">
-    <h2>✅ Dados reconhecidos pelo QR</h2>
-    <div id="qrData"></div>
-    <div class="status-line">
-      <span class="pill" id="qrCountPill">QR —</span>
-      <span class="pill ok">Leitura concluída</span>
-    </div>
-  </div>
-
-  <div id="qrVotesCard" class="card hidden">
-    <h2>Votos encontrados</h2>
-    <div id="qrVotes"></div>
-  </div>
-
-  <div id="qrSendCard" class="card sendbox hidden">
-    <h2>🚀 Enviar lançamento</h2>
-    <div class="summary">Confira os dados acima. O envio grava o BU no sistema como <b>SUBMETIDO</b> e depois ele fica disponível para conferência no painel administrativo.</div>
-    <div class="grid" style="margin-top:10px">
-      <label>Responsável
-        <input id="qrResponsavel" placeholder="Nome/identificação">
-      </label>
-      <label>Observação
-        <input id="qrObs" placeholder="Opcional">
-      </label>
-    </div>
-    <button id="sendQr" class="success" style="width:100%;margin-top:12px;font-size:16px">📤 Enviar para conferência</button>
-    <div id="sendMsg" class="msg"></div>
-  </div>
+<section id="qrScreen">
+<div class="card">
+<h2>📷 Leitura do QR Code do BU</h2>
+<div class="note">O QR é interpretado primeiro e só poderá ser enviado após a conferência dos dados.</div>
+<div id="reader"></div>
+<div class="grid2">
+<button id="start" class="primary">📷 Iniciar câmera</button>
+<button id="stop" class="secondary">⏹️ Parar câmera</button>
+</div>
+<label style="display:block;margin-top:10px">Ou selecione uma foto do QR Code
+<input id="fileInput" type="file" accept="image/*"></label>
+<img id="preview" class="preview">
+<div id="msg" class="msg"></div>
+<div id="diag" class="diag">Aguardando leitura.</div>
 </div>
 
-<!-- ===================== MANUAL ===================== -->
-<div id="manualScreen" class="hidden">
-  <div class="card">
-    <h2>1. Dados da seção</h2>
-    <div class="grid">
-      <label>Seção
-        <select id="secao">
-          <option value="">Selecione a seção</option>
-          <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
-          <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
-          <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
-          <option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option>
-          <option value="17">17</option><option value="32">32</option><option value="33">33</option><option value="34">34</option>
-          <option value="137">137</option><option value="140">140</option><option value="143">143</option><option value="159">159</option>
-          <option value="161">161</option><option value="162">162</option><option value="163">163</option><option value="164">164</option>
-          <option value="175">175</option><option value="180">180</option><option value="506">506 — TESTE</option>
-        </select>
-      </label>
-      <label>IDUE
-        <input id="idue" placeholder="ID da urna">
-      </label>
-      <label>Zona<input id="zona" value="30" readonly></label>
-      <label>Município<input id="municipio" value="DESTERRO" readonly></label>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>2. Dados da seção</h2>
-    <div class="grid3">
-      <label>Aptos<input id="apto" type="number" min="0"></label>
-      <label>Comparecimento<input id="comp" type="number" min="0"></label>
-      <label>Faltosos<input id="falt" type="number" min="0"></label>
-      <label>Válidos<input id="validos" type="number" min="0"></label>
-      <label>Brancos<input id="brancos" type="number" min="0"></label>
-      <label>Nulos<input id="nulos" type="number" min="0"></label>
-    </div>
-    <div id="balance" class="summary" style="margin-top:10px">Aptos = Comparecimento + Faltosos</div>
-  </div>
-
-  <div class="card">
-    <h2>3. Votos</h2>
-    <div id="candidateSections"></div>
-    <div class="summary">Brancos e nulos são informados somente nos campos gerais acima.</div>
-  </div>
-
-  <div class="card">
-    <h2>4. Enviar lançamento</h2>
-    <div class="grid">
-      <label>Responsável<input id="responsavel" placeholder="Nome do responsável"></label>
-      <label>Origem<select id="origem"><option value="MANUAL">MANUAL</option></select></label>
-    </div>
-    <label style="margin-top:10px">Observação<textarea id="obs" placeholder="Observações, se necessário"></textarea></label>
-    <button id="sendManual" class="success" style="width:100%;margin-top:12px">📤 Enviar lançamento</button>
-    <div id="manualMsg" class="msg"></div>
-  </div>
+<div id="qrDataCard" class="card hidden">
+<h2>Conferência do BU lido</h2>
+<div id="qrData"></div>
+<div class="summary">
+<strong>Importante:</strong> este leitor não envia automaticamente. Revise os dados e, se estiver correto, use o botão abaixo.
 </div>
+<div style="margin-top:12px">
+<button id="prepareSend" class="success" disabled>✓ Confirmar leitura e preparar envio</button>
+</div>
+</div>
+</section>
+
+<section id="manualScreen" class="hidden">
+<div class="card">
+<h2>1. Identificação</h2>
+<div class="grid">
+<label>Seção<input id="secao"></label>
+<label>IDUE<input id="idue"></label>
+<label>Zona<input id="zona"></label>
+<label>Município<input id="municipio"></label>
+<label>Origem<select id="origem"><option>MANUAL</option><option>QR</option></select></label>
+<label>Responsável<input id="responsavel"></label>
+</div>
+</div>
+<div class="card">
+<h2>2. Dados gerais</h2>
+<div class="grid">
+<label>Aptos<input id="apto" type="number" min="0"></label>
+<label>Comparecimento<input id="comp" type="number" min="0"></label>
+<label>Faltosos<input id="falt" type="number" min="0"></label>
+<label>Válidos<input id="validos" type="number" min="0"></label>
+<label>Brancos<input id="brancos" type="number" min="0"></label>
+<label>Nulos<input id="nulos" type="number" min="0"></label>
+</div>
+<div id="balance" class="check"></div>
+</div>
+<div class="card"><h2>3. Votos</h2><div id="candidateSections"></div></div>
+<div class="card">
+<label>Observação<textarea id="obs"></textarea></label>
+<button id="send" class="success" style="margin-top:10px">Enviar lançamento</button>
+</div>
+</section>
 </div>
 
 <iframe name="submitFrame" style="display:none"></iframe>
-
+<script src="https://unpkg.com/html5-qrcode" defer></script>
 <script>
 (function(){
 "use strict";
-
-const BACKEND="https://script.google.com/macros/s/AKfycbxhK0A_ra_MJEkbyC-VF4raUZI2j-SWZVeu8QJDr0l5W-yq_9VsKOATjbO3x1STP9ro/exec";
+const BACKEND="https://script.google.com/macros/s/AKfycbxhKQA_ra_MJEkbyC-VF4raUzI2j-SWZVeu8QJDr0I5W-yq_9VsKOATjbO3x1STP9ro/exec";
+const params=new URLSearchParams(location.search);
+const secaoUrl=(params.get("secao")||"").padStart(3,"0");
 
 const CANDIDATOS={
- "DEPUTADO FEDERAL":[
-  {numero:"1011",nome:"Hugo Motta"},{numero:"1044",nome:"Murilo Galdino"}
- ],
- "DEPUTADO ESTADUAL":[
-  {numero:"10111",nome:"Olivia Motta"},{numero:"22333",nome:"Gesica de Laurindo"}
- ],
- "SENADOR":[
-  {numero:"400",nome:"João Azevêdo"},{numero:"100",nome:"Nabor"},{numero:"155",nome:"Veneziano"}
- ],
- "GOVERNADOR":[
-  {numero:"11",nome:"Lucas Ribeiro"},{numero:"15",nome:"Cícero Lucena"},{numero:"22",nome:"Efraim Filho"}
- ],
- "PRESIDENTE":[
-  {numero:"13",nome:"Lula"},{numero:"22",nome:"Flávio Bolsonaro"}
- ]
+"DEPUTADO FEDERAL":[["1011","Hugo Motta"],["1044","Murilo Galdino"]],
+"DEPUTADO ESTADUAL":[["10111","Olivia Motta"],["22333","Gesica de Laurindo"]],
+"SENADOR":[["400","João Azevêdo"],["100","Nabor"],["155","Veneziano"]],
+"GOVERNADOR":[["11","Lucas Ribeiro"],["15","Cícero Lucena"],["22","Efraim Filho"]],
+"PRESIDENTE":[["13","Lula"],["22","Flávio Bolsonaro"]]
 };
+const CARGOS={1:"SENADOR",3:"GOVERNADOR",5:"PRESIDENTE",6:"DEPUTADO FEDERAL",7:"DEPUTADO ESTADUAL"};
 
-/*
-  Códigos de cargo usados pelo QRBU.
-  A ordem oficial de votação em 2026 é:
-  federal, estadual, senador, governador, presidente.
-  Os exemplos de QRBU/TSE mostram CARG com os códigos do cargo.
-*/
-const CARGO_QR={
- "6":"DEPUTADO FEDERAL",
- "7":"DEPUTADO ESTADUAL",
- "5":"SENADOR",
- "3":"GOVERNADOR",
- "1":"PRESIDENTE"
-};
-
-let scanner=null;
-let parts={};
-let parsed=null;
-let qrReady=false;
-let jsQRReady=false;
-let sending=false;
+let scanner=null,parts={},parsed=null,qrReady=false;
 
 const $=id=>document.getElementById(id);
+function msg(t,k){$("msg").textContent=t;$("msg").className="msg show "+(k||"")}
+function diag(t){$("diag").textContent=new Date().toLocaleTimeString()+" — "+t}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 
-function esc(s){
- return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-}
-function showMsg(id,text,kind){
- const e=$(id); e.textContent=text; e.className="msg show "+(kind||"");
-}
-function diag(text){$("diag").textContent=new Date().toLocaleTimeString()+" — "+text;}
-
-function loadScript(src,name,cb){
- const s=document.createElement("script");
- s.src=src;s.async=true;
- s.onload=()=>{diag(name+" carregado.");cb(true)};
- s.onerror=()=>{diag("Falha ao carregar "+name+".");cb(false)};
- document.head.appendChild(s);
-}
-loadScript("https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js","html5-qrcode",ok=>{qrReady=ok});
-loadScript("https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js","jsQR",ok=>{jsQRReady=ok});
-
-function cargoNome(v){return CARGO_QR[String(v)]||"CARGO "+String(v||"");}
-function tipoNome(v){
- const s=String(v==null?"":v);
- if(s==="0")return "CANDIDATO";
- if(s==="1")return "CANDIDATO";
- return "CANDIDATO";
-}
-function nomeCandidato(cargo,numero){
- const lista=CANDIDATOS[cargo]||[];
- const f=lista.find(x=>String(x.numero)===String(numero));
- return f?f.nome:"OUTRO CANDIDATO";
+function renderCandidates(){
+const root=$("candidateSections"); root.innerHTML="";
+Object.entries(CANDIDATOS).forEach(([cargo,arr])=>{
+const box=document.createElement("div");box.className="cargo";
+box.innerHTML="<h3>"+cargo+"</h3>";
+arr.forEach(([num,nome])=>{
+const row=document.createElement("div");row.style.cssText="display:grid;grid-template-columns:75px 1fr 100px;gap:8px;padding:7px 10px;align-items:center";
+row.innerHTML="<span class='badge'>"+num+"</span><strong>"+nome+"</strong><input class='vote-input' type='number' min='0' data-cargo='"+esc(cargo)+"' data-numero='"+num+"' data-candidato='"+esc(nome)+"' placeholder='0'>";
+box.appendChild(row);
+});
+const other=document.createElement("div");other.className="note";other.style.padding="8px 10px";other.textContent="Outros registros do QR permanecem armazenados mesmo que não estejam destacados nesta lista.";
+box.appendChild(other);root.appendChild(box);
+});
 }
 
-/* ===================== MANUAL ===================== */
-
-function renderCandidateSections(){
- const root=$("candidateSections");root.innerHTML="";
- Object.entries(CANDIDATOS).forEach(([cargo,lista])=>{
-  const box=document.createElement("div");
-  box.innerHTML="<h3>"+esc(cargo)+"</h3><div class='candidate-head'><span>NÚMERO</span><span>CANDIDATO</span><span>VOTOS</span></div>";
-  lista.forEach(c=>{
-   const row=document.createElement("div");row.className="row";
-   row.innerHTML="<input value='"+esc(c.numero)+"' readonly><div class='name'>"+esc(c.nome)+"</div><input class='vote-input' type='number' min='0' data-cargo='"+esc(cargo)+"' data-tipo='CANDIDATO' data-numero='"+esc(c.numero)+"' data-candidato='"+esc(c.nome)+"' placeholder='0'>";
-   box.appendChild(row);
-  });
-  const other=document.createElement("div");other.className="other";other.dataset.cargo=cargo;
-  other.innerHTML="<button type='button' class='secondary addOther'>＋ Outro candidato</button><div class='otherRows'></div>";
-  other.querySelector(".addOther").onclick=()=>{
-   const r=document.createElement("div");r.className="row otherRow";
-   r.innerHTML="<input class='other-numero' type='text' inputmode='numeric' placeholder='Número'><input class='other-nome' type='text' placeholder='Nome do candidato'><input class='other-votos' type='number' min='0' placeholder='0'>";
-   other.querySelector(".otherRows").appendChild(r);
-  };
-  box.appendChild(other);
-  root.appendChild(box);
- });
+function tokenize(text){
+return text.replace(/[\r\n\t]+/g," ").split(/\s+/).map(x=>x.trim()).filter(Boolean);
 }
-renderCandidateSections();
-
-function updateBalance(){
- const a=Number($("apto").value||0),c=Number($("comp").value||0),f=Number($("falt").value||0);
- const ok=a===c+f;
- $("balance").textContent="Aptos = Comparecimento + Faltosos: "+a+" = "+c+" + "+f+" "+(ok?"✓":"⚠ Não fecha");
- $("balance").style.background=ok?"#f0fdf4":"#fef2f2";
- $("balance").style.color=ok?"#166534":"#991b1b";
+function parseMeta(tokens){
+const meta={}; for(const t of tokens){const m=t.match(/^([A-Z][A-Z0-9]*):(.+)$/);if(m)meta[m[1]]=m[2]} return meta;
 }
-["apto","comp","falt"].forEach(id=>$(id).addEventListener("input",updateBalance));
-
-function collectVotesManual(){
- const votos=[];
- document.querySelectorAll(".vote-input").forEach(i=>{
-  const n=Number(i.value||0);
-  if(n>0)votos.push({cargo:i.dataset.cargo,tipo:"CANDIDATO",numero:i.dataset.numero,candidato:i.dataset.candidato,votos:n});
- });
- document.querySelectorAll(".otherRow").forEach(r=>{
-  const numero=r.querySelector(".other-numero").value.trim();
-  const nome=r.querySelector(".other-nome").value.trim();
-  const n=Number(r.querySelector(".other-votos").value||0);
-  if(numero||nome||n>0){
-   if(!numero||!nome)throw Error("Preencha número e nome do outro candidato.");
-   votos.push({cargo:r.closest(".other").dataset.cargo,tipo:"CANDIDATO",numero,candidato:nome,votos:n});
-  }
- });
- return votos;
+function numericPair(t){
+const m=t.match(/^(\d{1,8}):(\d+)$/);return m?{numero:m[1],votos:Number(m[2])}:null;
 }
-
-/* ===================== QR PARSER ===================== */
-
-/*
-  O QRBU real é delimitado por espaços ou por "|".
-  Não podemos usar uma regex que pare no primeiro "|" ou que trate
-  "1011:65" como se fosse um campo de metadado.
-*/
-function normalizeQRText(text){
- return String(text||"")
-   .replace(/\r?\n/g," ")
-   .replace(/\|/g," ")
-   .replace(/\s+/g," ")
-   .trim();
-}
-
-function parseMetadataTokens(text){
- const normalized=normalizeQRText(text);
- return normalized.split(" ").filter(Boolean);
-}
+function cargoNome(code){return CARGOS[String(code)]||"CARG_"+String(code)}
+function tipoNome(t){return String(t)==="1"?"CANDIDATO/LEGENDA":String(t)==="0"?"CANDIDATO":"TIPO_"+String(t)}
 
 function parseQRs(codes){
- if(!codes||!codes.length)throw Error("Nenhum QR recebido.");
+if(!codes.length)throw Error("Nenhum QR foi recebido.");
+const headers=codes.map(x=>x.match(/^QRBU:(\d+):(\d+)/));
+if(headers.some(x=>!x))throw Error("QR inválido: não começa com QRBU.");
+const total=Number(headers[0][2]);
+if(headers.some(x=>Number(x[2])!==total))throw Error("QRs indicam quantidades diferentes.");
+if(codes.length!==total)throw Error("Faltam QR Codes. Esperados "+total+".");
+for(let i=0;i<headers.length;i++)if(Number(headers[i][1])!==i+1)throw Error("QR Codes fora de ordem.");
 
- const headers=codes.map(code=>{
-  const m=String(code).trim().match(/^QRBU:(\d+):(\d+)/);
-  if(!m)throw Error("Um dos QR Codes não possui cabeçalho QRBU válido.");
-  return {index:Number(m[1]),total:Number(m[2])};
- });
+const content=codes.map(x=>x.replace(/^QRBU:\d+:\d+\s*/,"").trim()).join(" ");
+const tokens=tokenize(content);
+const meta=parseMeta(tokens);
+const p={zona:meta.ZONA||"",secao:meta.SECA||"",municipio:meta.MUNI||"",idue:meta.IDUE||"",
+apto:Number(meta.APTO||0),comparecimento:Number(meta.COMP||meta.COMD||0),faltosos:Number(meta.FALT||meta.SALT||0),
+qtdQr:total,rawQr:codes.join("\n"),votos:[],cargos:[],gerais:{brancos:0,nulos:0,validos:0}};
 
- const total=headers[0].total;
- if(headers.some(h=>h.total!==total))throw Error("Os QR Codes informam quantidades diferentes.");
- if(codes.length!==total)throw Error("Faltam QR Codes. Esperados "+total+".");
- headers.sort((a,b)=>a.index-b.index);
- for(let i=0;i<headers.length;i++){
-  if(headers[i].index!==i+1)throw Error("QR Code fora da sequência. Esperado "+(i+1)+".");
- }
-
- const content=codes
-  .slice()
-  .sort((a,b)=>{
-   const ai=Number(String(a).match(/^QRBU:(\d+):/)[1]);
-   const bi=Number(String(b).match(/^QRBU:(\d+):/)[1]);
-   return ai-bi;
-  })
-  .map(code=>String(code).trim().replace(/^QRBU:\d+:\d+\s*/,""))
-  .join(" ");
-
- const tokens=parseMetadataTokens(content);
-
- const p={
-  zona:"",
-  secao:"",
-  municipio:"",
-  idue:"",
-  apto:0,
-  comparecimento:0,
-  faltosos:0,
-  brancos:0,
-  nulos:0,
-  qtdQr:total,
-  rawQr:codes.join("\n"),
-  votos:[],
-  blocos:[]
- };
-
- let cargoAtual=null;
- let tipoAtual="";
- let partidoAtual="";
- let pendingLegend=false;
-
- for(const token of tokens){
-  const kv=token.match(/^([A-Z][A-Z0-9]*):(.+)$/);
-  if(kv){
-   const k=kv[1],v=kv[2];
-
-   if(k==="ZONA")p.zona=v;
-   else if(k==="SECA")p.secao=v;
-   else if(k==="MUNI")p.municipio=v;
-   else if(k==="IDUE")p.idue=v;
-   else if(k==="APTO")p.apto=Number(v)||0;
-   else if(k==="COMP" || k==="COMD")p.comparecimento=Number(v)||0;
-   else if(k==="FALT" || k==="SALT")p.faltosos=Number(v)||0;
-   else if(k==="CARG"){
-    cargoAtual=cargoNome(v);
-    tipoAtual="";
-    partidoAtual="";
-    pendingLegend=false;
-    p.blocos.push({cargo:cargoAtual,brancos:0,nulos:0});
-   }
-   else if(k==="TIPO"){
-    tipoAtual=tipoNome(v);
-   }
-   else if(k==="PART"){
-    partidoAtual=v;
-   }
-   else if(k==="LEGP"){
-    const n=Number(v)||0;
-    if(cargoAtual && n>0){
-     p.votos.push({
-      cargo:cargoAtual,
-      tipo:"LEGENDA",
-      numero:partidoAtual||"",
-      candidato:partidoAtual?"PARTIDO "+partidoAtual:"LEGENDA",
-      votos:n
-     });
-    }
-   }
-   else if(k==="BRAN"){
-    const n=Number(v)||0;
-    p.brancos+=n;
-    const b=p.blocos[p.blocos.length-1];if(b)b.brancos=n;
-   }
-   else if(k==="NULO"){
-    const n=Number(v)||0;
-    p.nulos+=n;
-    const b=p.blocos[p.blocos.length-1];if(b)b.nulos=n;
-   }
-   else if(k==="NOMI"||k==="TOTC"||k==="VOTC"||k==="TOTP"||k==="LEGC"){
-    /* metadados/totais do bloco; não são votos individuais */
-   }
-   continue;
-  }
-
-  const vote=token.match(/^(\d{1,8}):(\d+)$/);
-  if(vote && cargoAtual){
-   const numero=vote[1],n=Number(vote[2])||0;
-   if(n>0){
-    p.votos.push({
-     cargo:cargoAtual,
-     tipo:tipoAtual||"CANDIDATO",
-     numero,
-     candidato:nomeCandidato(cargoAtual,numero),
-     votos:n
-    });
-   }
-  }
- }
-
- if(!p.secao)throw Error("QR lido, mas a seção não foi encontrada.");
- if(!p.idue)throw Error("QR lido, mas o IDUE não foi encontrado.");
- if(p.apto && p.apto!==p.comparecimento+p.faltosos){
-  throw Error("Aptos não fecham com comparecimento + faltosos ("+p.apto+" ≠ "+p.comparecimento+" + "+p.faltosos+").");
- }
-
- /* Evita duplicação caso o mesmo registro apareça mais de uma vez */
- const unique=[];
- const seen=new Set();
- p.votos.forEach(v=>{
-  const key=[v.cargo,v.tipo,v.numero,v.votos].join("|");
-  if(!seen.has(key)){seen.add(key);unique.push(v)}
- });
- p.votos=unique;
-
- return p;
+let cargo=null, tipo=null, party=null;
+for(let i=0;i<tokens.length;i++){
+const t=tokens[i],m=t.match(/^([A-Z][A-Z0-9]*):(.+)$/);
+if(m){
+const k=m[1],v=m[2];
+if(k==="CARG"){cargo={codigo:String(v),nome:cargoNome(v),tipo:"",registros:[]};p.cargos.push(cargo);tipo=null;party=null}
+else if(k==="TIPO"&&cargo){tipo=String(v);cargo.tipo=tipo}
+else if(k==="PART"&&cargo){party=String(v)}
+else if(k==="BRAN"){if(cargo)cargo.brancos=Number(v);else p.gerais.brancos=Number(v)}
+else if(k==="NULO"){if(cargo)cargo.nulos=Number(v);else p.gerais.nulos=Number(v)}
+else if(k==="NOMI"&&cargo)cargo.nominais=Number(v)
+else if((k==="LEGC"||k==="LEGP")&&cargo)cargo.legenda=Number(v)
+else if((k==="TOTC"||k==="TOTP"||k==="TUTC")&&cargo)cargo.total=Number(v)
+continue;
+}
+const pair=numericPair(t);
+if(pair&&cargo){
+const rec={cargo:cargo.nome,cargoCodigo:cargo.codigo,tipo:"CANDIDATO",numero:pair.numero,candidato:"",votos:pair.votos,partido:party||""};
+cargo.registros.push(rec);p.votos.push(rec);
+}
+}
+for(const c of p.cargos){
+c.registros.forEach(r=>{
+const hit=(CANDIDATOS[c.nome]||[]).find(x=>x[0]===r.numero);
+if(hit)r.candidato=hit[1];
+else r.candidato="OUTRO CANDIDATO";
+});
+if(Number.isFinite(c.brancos))p.gerais.brancos+=c.brancos;
+if(Number.isFinite(c.nulos))p.gerais.nulos+=c.nulos;
+}
+p.validos=p.cargos.reduce((s,c)=>s+Number(c.nominais||0)+Number(c.legenda||0),0);
+if(!p.validos){
+p.validos=p.comparecimento-p.gerais.brancos-p.gerais.nulos;
+}
+if(p.apto && p.apto!==p.comparecimento+p.faltosos)throw Error("Aptos não fecham: "+p.apto+" ≠ "+p.comparecimento+" + "+p.faltosos);
+if(p.secao&&secaoUrl&&p.secao.padStart(3,"0")!==secaoUrl)throw Error("QR indica seção "+p.secao+"; este link é da seção "+secaoUrl+".");
+return p;
 }
 
-function fillFromParsed(p){
- $("qrData").innerHTML=
-  "<div class='grid'>"+
-  "<div><b>Zona:</b> "+esc(p.zona)+"</div>"+
-  "<div><b>Seção:</b> "+esc(p.secao)+"</div>"+
-  "<div><b>Município:</b> "+esc(p.municipio)+"</div>"+
-  "<div><b>IDUE:</b> "+esc(p.idue)+"</div>"+
-  "<div><b>Aptos:</b> "+p.apto+"</div>"+
-  "<div><b>Comparecimento:</b> "+p.comparecimento+"</div>"+
-  "<div><b>Faltosos:</b> "+p.faltosos+"</div>"+
-  "<div><b>Brancos:</b> "+p.brancos+"</div>"+
-  "<div><b>Nulos:</b> "+p.nulos+"</div>"+
-  "</div>";
-
- $("qrCountPill").textContent="QR: "+p.qtdQr;
- renderQRVotes(p);
-
- $("qrDataCard").classList.remove("hidden");
- $("qrVotesCard").classList.remove("hidden");
- $("qrSendCard").classList.remove("hidden");
- $("sendQr").disabled=false;
+function renderParsed(p){
+$("secao").value=p.secao;$("idue").value=p.idue;$("zona").value=p.zona;$("municipio").value=p.municipio;
+$("apto").value=p.apto;$("comp").value=p.comparecimento;$("falt").value=p.faltosos;$("validos").value=p.validos;
+$("brancos").value=p.gerais.brancos;$("nulos").value=p.gerais.nulos;$("origem").value="QR";
+$("balance").textContent="Aptos = Comparecimento + Faltosos: "+p.apto+" = "+p.comparecimento+" + "+p.faltosos+" ✓";
+document.querySelectorAll(".vote-input").forEach(i=>i.value="");
+for(const v of p.votos){
+const i=document.querySelector(".vote-input[data-cargo='"+CSS.escape(v.cargo)+"'][data-numero='"+CSS.escape(v.numero)+"']");
+if(i)i.value=v.votos;
 }
-
-function renderQRVotes(p){
- if(!p.votos.length){
-  $("qrVotes").innerHTML="<div class='summary'>Nenhum voto individual reconhecido.</div>";
-  return;
- }
- const groups={};
- p.votos.forEach(v=>{
-  if(!groups[v.cargo])groups[v.cargo]=[];
-  groups[v.cargo].push(v);
- });
- let html="";
- Object.entries(groups).forEach(([cargo,arr])=>{
-  html+="<h3>"+esc(cargo)+"</h3>";
-  html+="<table class='vote-table'><thead><tr><th>NÚMERO</th><th>REGISTRO</th><th>VOTOS</th></tr></thead><tbody>";
-  arr.forEach(v=>{
-   html+="<tr><td>"+esc(v.numero||"—")+"</td><td>"+esc(v.candidato||"")+(v.tipo==="LEGENDA"?" <small>(legenda)</small>":"")+"</td><td>"+v.votos+"</td></tr>";
-  });
-  html+="</tbody></table>";
- });
- $("qrVotes").innerHTML=html;
+let html="<div class='grid2'><div><b>Seção:</b> "+esc(p.secao)+"</div><div><b>IDUE:</b> "+esc(p.idue)+"</div><div><b>Zona:</b> "+esc(p.zona)+"</div><div><b>Município:</b> "+esc(p.municipio)+"</div><div><b>Aptos:</b> "+p.apto+"</div><div><b>Comparecimento:</b> "+p.comparecimento+"</div><div><b>Faltosos:</b> "+p.faltosos+"</div><div><b>QRs:</b> "+p.qtdQr+"</div><div><b>Brancos:</b> "+p.gerais.brancos+"</div><div><b>Nulos:</b> "+p.gerais.nulos+"</div></div>";
+for(const c of p.cargos){
+html+="<div class='cargo'><h4>"+esc(c.nome)+" <span class='badge'>CARG "+esc(c.codigo)+" • TIPO "+esc(c.tipo)+"</span></h4><table><thead><tr><th>Número</th><th>Identificação</th><th>Votos</th></tr></thead><tbody>";
+for(const r of c.registros)html+="<tr><td>"+esc(r.numero)+"</td><td>"+esc(r.candidato)+"</td><td>"+r.votos+"</td></tr>";
+html+="</tbody><tfoot><tr><td colspan='2'>Brancos / Nulos / Total</td><td>"+Number(c.brancos||0)+" / "+Number(c.nulos||0)+" / "+Number(c.total||0)+"</td></tr></tfoot></table></div>";
 }
-
-/* ===================== LEITURA QR ===================== */
+$("qrData").innerHTML=html;$("qrDataCard").classList.remove("hidden");$("prepareSend").disabled=false;
+}
 
 function onScan(text){
- const raw=String(text||"");
- diag("Texto QR recebido:\n"+raw.slice(0,1800));
-
- const m=raw.match(/^QRBU:(\d+):(\d+)/);
- if(!m){
-  showMsg("msg","QR detectado, mas não reconhecido como QRBU.","err");
-  return;
- }
- const idx=Number(m[1]),total=Number(m[2]);
- parts[idx]=raw;
- showMsg("msg","QR "+idx+" de "+total+" lido.","ok");
-
- if(Object.keys(parts).length===total){
-  try{
-   parsed=parseQRs(Object.keys(parts).sort((a,b)=>Number(a)-Number(b)).map(k=>parts[k]));
-   fillFromParsed(parsed);
-   stopCamera();
-   showMsg("msg","Todos os QR Codes foram lidos. Confira os dados antes de enviar.","ok");
-  }catch(e){
-   parsed=null;
-   $("qrDataCard").classList.add("hidden");
-   $("qrVotesCard").classList.add("hidden");
-   $("qrSendCard").classList.add("hidden");
-   showMsg("msg",e.message||String(e),"err");
-   diag("Erro de interpretação:\n"+(e.stack||e));
-  }
- }
+diag("QR bruto: "+text.slice(0,900));
+const m=text.match(/^QRBU:(\d+):(\d+)/);if(!m){msg("QR detectado, mas não reconhecido como QRBU.","err");return}
+const idx=Number(m[1]),total=Number(m[2]);parts[idx]=text;
+msg("QR "+idx+" de "+total+" lido.","ok");
+if(Object.keys(parts).length===total){
+try{parsed=parseQRs(Object.keys(parts).sort((a,b)=>a-b).map(k=>parts[k]));renderParsed(parsed);stopCamera();msg("Todos os QR Codes foram lidos. Revise antes de enviar.","ok")}
+catch(e){parsed=null;$("prepareSend").disabled=true;msg(e.message||String(e),"err");diag("ERRO: "+(e.message||e))}
+}
 }
 
 async function startCamera(){
- if(!qrReady||!window.Html5Qrcode){
-  showMsg("msg","Leitor de câmera ainda está carregando. Aguarde alguns segundos.","err");return;
- }
- await stopCamera();
- parts={};
- scanner=new Html5Qrcode("reader");
- try{
-  await scanner.start(
-   {facingMode:"environment"},
-   {fps:10,qrbox:{width:260,height:260}},
-   text=>onScan(text),
-   ()=>{}
-  );
-  showMsg("msg","Câmera iniciada. Aponte para o QR do BU.","ok");
- }catch(e){
-  showMsg("msg","Não foi possível iniciar a câmera: "+e,"err");
- }
+if(!window.Html5Qrcode){msg("Biblioteca de leitura ainda está carregando. Tente novamente.","err");return}
+await stopCamera();parts={};parsed=null;$("prepareSend").disabled=true;
+scanner=new Html5Qrcode("reader");
+try{await scanner.start({facingMode:"environment"},{fps:10,qrbox:{width:280,height:280}},onScan,()=>{});msg("Câmera iniciada. Aponte para o QR do BU.","ok")}catch(e){msg("Não foi possível iniciar a câmera: "+e,"err")}
+}
+async function stopCamera(){if(scanner){try{await scanner.stop()}catch(e){}try{scanner.clear()}catch(e){}scanner=null}}
+
+function collectVotes(){
+const votos=[];document.querySelectorAll(".vote-input").forEach(i=>{const n=Number(i.value||0);if(n>0)votos.push({cargo:i.dataset.cargo,tipo:"CANDIDATO",numero:i.dataset.numero,candidato:i.dataset.candidato,votos:n})});
+return votos;
+}
+function submitPayload(){
+const secao=$("secao").value.trim(),idue=$("idue").value.trim(),apto=Number($("apto").value||0),comp=Number($("comp").value||0),falt=Number($("falt").value||0);
+if(!secao||!idue)throw Error("Informe seção e IDUE.");
+if(apto!==comp+falt)throw Error("Aptos deve ser igual a Comparecimento + Faltosos.");
+const payload={secao,idue,aptos:apto,comparecimento:comp,faltosos:falt,validos:Number($("validos").value||0),brancos:Number($("brancos").value||0),nulos:Number($("nulos").value||0),origem:$("origem").value,observacao:$("obs").value.trim(),responsavel:$("responsavel").value.trim(),votos:collectVotes()};
+if(!payload.votos.length)throw Error("Nenhum voto nominal destacado foi informado.");
+const form=document.createElement("form");form.method="POST";form.action=BACKEND;form.target="submitFrame";form.style.display="none";
+const input=document.createElement("input");input.type="hidden";input.name="payload";input.value=JSON.stringify(payload);form.appendChild(input);document.body.appendChild(form);form.submit();setTimeout(()=>form.remove(),1200);
+msg("Lançamento enviado para conferência.","ok");
 }
 
-async function stopCamera(){
- if(scanner){
-  try{await scanner.stop()}catch(e){}
-  try{scanner.clear()}catch(e){}
-  scanner=null;
- }
-}
-
-function canvasVariants(img){
- const list=[];
- function add(name,crop,mode,scale){
-  const c=document.createElement("canvas");
-  c.width=Math.max(1,Math.floor(img.naturalWidth*crop.w*scale));
-  c.height=Math.max(1,Math.floor(img.naturalHeight*crop.h*scale));
-  const ctx=c.getContext("2d",{willReadFrequently:true});
-  ctx.drawImage(
-   img,
-   img.naturalWidth*crop.x,img.naturalHeight*crop.y,
-   img.naturalWidth*crop.w,img.naturalHeight*crop.h,
-   0,0,c.width,c.height
-  );
-  if(mode==="gray"||mode==="bw"){
-   const d=ctx.getImageData(0,0,c.width,c.height),a=d.data;
-   for(let i=0;i<a.length;i+=4){
-    let y=.299*a[i]+.587*a[i+1]+.114*a[i+2];
-    if(mode==="bw")y=y>150?255:0;
-    a[i]=a[i+1]=a[i+2]=y;
-   }
-   ctx.putImageData(d,0,0);
-  }
-  list.push({name,canvas:c});
- }
- add("full-gray",{x:0,y:0,w:1,h:1},"gray",1);
- add("full-bw",{x:0,y:0,w:1,h:1},"bw",1);
- add("center-gray",{x:.08,y:.08,w:.84,h:.84},"gray",1.5);
- add("center-bw",{x:.08,y:.08,w:.84,h:.84},"bw",1.5);
- return list;
-}
-
-async function scanPhoto(file){
- if(!file)return;
- if(!jsQRReady||!window.jsQR){
-  showMsg("msg","Leitor de foto ainda está carregando. Aguarde alguns segundos.","err");return;
- }
- await stopCamera();
- parts={};
- const url=URL.createObjectURL(file),img=new Image();
- img.onload=async()=>{
-  $("preview").src=url;$("preview").style.display="block";
-  try{
-   for(const v of canvasVariants(img)){
-    const ctx=v.canvas.getContext("2d",{willReadFrequently:true});
-    const data=ctx.getImageData(0,0,v.canvas.width,v.canvas.height);
-    const code=window.jsQR(data.data,data.width,data.height,{inversionAttempts:"attemptBoth"});
-    if(code&&code.data){
-     showMsg("msg","QR encontrado. Interpretando dados…","ok");
-     onScan(code.data);
-     URL.revokeObjectURL(url);
-     return;
-    }
-   }
-   showMsg("msg","A foto foi aberta, mas o QR não foi decodificado. Tente uma foto mais próxima e sem reflexos.","err");
-  }catch(e){
-   showMsg("msg","Erro ao processar a foto: "+e,"err");
-  }
- };
- img.onerror=()=>showMsg("msg","Não consegui abrir a foto selecionada.","err");
- img.src=url;
-}
-
-function clearQR(){
- stopCamera();parts={};parsed=null;
- $("qrDataCard").classList.add("hidden");
- $("qrVotesCard").classList.add("hidden");
- $("qrSendCard").classList.add("hidden");
- $("preview").style.display="none";
- $("preview").removeAttribute("src");
- $("fileInput").value="";
- $("sendQr").disabled=false;
- showMsg("msg","Leitura limpa. Pronto para outro QR Code.","info");
- diag("Aguardando leitura do QR Code.");
-}
-
-/* ===================== ENVIO ===================== */
-
-function submitPayload(payload){
- const form=document.createElement("form");
- form.method="POST";form.action=BACKEND;form.target="submitFrame";form.style.display="none";
- const input=document.createElement("input");
- input.type="hidden";input.name="payload";input.value=JSON.stringify(payload);
- form.appendChild(input);document.body.appendChild(form);
- form.submit();
- setTimeout(()=>form.remove(),1200);
-}
-
-function payloadFromQR(){
- if(!parsed)throw Error("Nenhum BU foi reconhecido.");
- if(!parsed.secao||!parsed.idue)throw Error("Seção e IDUE são obrigatórios.");
-
- return {
-  secao:String(parsed.secao),
-  idue:String(parsed.idue),
-  aptos:Number(parsed.apto||0),
-  comparecimento:Number(parsed.comparecimento||0),
-  faltosos:Number(parsed.faltosos||0),
-  /*
-   * O QR fornece brancos/nulos por cargo. O sistema atual possui
-   * campos gerais. Aqui usamos os totais reconhecidos pelo QR.
-   * Válidos será calculado apenas como informação auxiliar.
-   */
-  validos:Math.max(0,Number(parsed.comparecimento||0)-Number(parsed.brancos||0)-Number(parsed.nulos||0)),
-  brancos:Number(parsed.brancos||0),
-  nulos:Number(parsed.nulos||0),
-  origem:"QR",
-  observacao:$("qrObs").value.trim(),
-  responsavel:$("qrResponsavel").value.trim(),
-  votos:parsed.votos
- };
-}
-
-$("sendQr").onclick=()=>{
- if(sending)return;
- try{
-  const payload=payloadFromQR();
-  if(!payload.votos.length)throw Error("Nenhum voto individual foi reconhecido pelo QR.");
-  sending=true;
-  $("sendQr").disabled=true;
-  showMsg("sendMsg","Enviando BU para o sistema…","info");
-  submitPayload(payload);
-  setTimeout(()=>{
-   showMsg("sendMsg","✓ BU enviado para conferência. A seção ficará como SUBMETIDA até a confirmação no painel administrativo.","ok");
-  },900);
- }catch(e){
-  sending=false;
-  $("sendQr").disabled=false;
-  showMsg("sendMsg",e.message||String(e),"err");
- }
+$("prepareSend").onclick=()=>{
+if(!parsed)return; $("manualScreen").classList.remove("hidden"); $("qrScreen").classList.add("hidden");
+$("tabQr").className="secondary";$("tabManual").className="primary";$("manualScreen").scrollIntoView({behavior:"smooth"});
+msg("Dados do QR preparados. Revise os campos e depois envie o lançamento.","info");
 };
+$("send").onclick=()=>{try{submitPayload()}catch(e){msg(e.message||String(e),"err")}};
+$("tabQr").onclick=()=>{$("qrScreen").classList.remove("hidden");$("manualScreen").classList.add("hidden");$("tabQr").className="primary";$("tabManual").className="secondary"};
+$("tabManual").onclick=()=>{$("qrScreen").classList.add("hidden");$("manualScreen").classList.remove("hidden");$("tabQr").className="secondary";$("tabManual").className="primary"};
+$("start").onclick=startCamera;$("stop").onclick=stopCamera;
+$("fileInput").onchange=async e=>{const file=e.target.files[0];if(!file)return;msg("Para teste por foto, use a câmera/reader externo que já está no GitHub Pages.","info");e.target.value=""};
 
-$("sendManual").onclick=()=>{
- try{
-  const secao=$("secao").value.trim(),idue=$("idue").value.trim();
-  const apto=Number($("apto").value||0),comp=Number($("comp").value||0),falt=Number($("falt").value||0);
-  if(!secao||!idue)throw Error("Informe seção e IDUE.");
-  if(apto!==comp+falt)throw Error("Aptos deve ser igual a Comparecimento + Faltosos.");
-  const votos=collectVotesManual();
-  if(!votos.length)throw Error("Informe pelo menos um voto.");
-  submitPayload({
-   secao,idue,aptos:apto,comparecimento:comp,faltosos:falt,
-   validos:Number($("validos").value||0),brancos:Number($("brancos").value||0),nulos:Number($("nulos").value||0),
-   origem:"MANUAL",observacao:$("obs").value.trim(),responsavel:$("responsavel").value.trim(),votos
-  });
-  showMsg("manualMsg","✓ Lançamento enviado para conferência.","ok");
- }catch(e){showMsg("manualMsg",e.message||String(e),"err")}
-};
-
-/* ===================== ABAS ===================== */
-
-$("tabQr").onclick=()=>{
- $("qrScreen").classList.remove("hidden");
- $("manualScreen").classList.add("hidden");
- $("tabQr").className="primary";
- $("tabManual").className="secondary";
-};
-$("tabManual").onclick=()=>{
- $("qrScreen").classList.add("hidden");
- $("manualScreen").classList.remove("hidden");
- $("tabQr").className="secondary";
- $("tabManual").className="primary";
- $("manualScreen").scrollIntoView({behavior:"smooth"});
-};
-
-$("start").onclick=startCamera;
-$("stop").onclick=stopCamera;
-$("clearQr").onclick=clearQR;
-$("fileInput").onchange=e=>{scanPhoto(e.target.files[0]);e.target.value=""};
-
-updateBalance();
-diag("Sistema carregado. Leitores QR iniciando…");
-
+renderCandidates();
+if(secaoUrl)$("secao").value=secaoUrl;
 })();
 </script>
 </body>
