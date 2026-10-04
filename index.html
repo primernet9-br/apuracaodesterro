@@ -47,6 +47,9 @@ table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:7px;borde
 <button id="start" class="primary">📷 Iniciar câmera</button>
 <button id="stop" class="secondary">⏹️ Parar câmera</button>
 </div>
+<div style="margin-top:10px">
+<button id="clear" class="secondary" style="width:100%">🧹 Limpar leitura</button>
+</div>
 <label style="display:block;margin-top:10px">Ou selecione uma foto do QR Code
 <input id="fileInput" type="file" accept="image/*"></label>
 <img id="preview" class="preview">
@@ -258,16 +261,54 @@ const input=document.createElement("input");input.type="hidden";input.name="payl
 msg("Lançamento enviado para conferência.","ok");
 }
 
+async function scanPhoto(file){
+if(!file)return;
+parts={};parsed=null;$("prepareSend").disabled=true;
+$("preview").src=URL.createObjectURL(file);$("preview").style.display="block";
+msg("Processando a foto do QR Code…","info");
+diag("Lendo a imagem: "+file.name);
+try{
+  await stopCamera();
+  if(!window.Html5Qrcode)throw Error("O leitor QR ainda está carregando. Aguarde alguns segundos e tente novamente.");
+  scanner=new Html5Qrcode("reader");
+  const text=await scanner.scanFile(file,true);
+  diag("QR encontrado na foto.");
+  onScan(text);
+  try{await scanner.clear()}catch(e){}
+  scanner=null;
+}catch(e){
+  try{if(scanner){await scanner.clear()}}catch(_){}
+  scanner=null;
+  msg("Não foi possível ler o QR nessa foto. Tente uma imagem mais próxima, nítida e sem reflexos.","err");
+  diag("Falha na leitura da foto: "+(e.message||e));
+}
+}
+
+function clearAll(){
+stopCamera();parts={};parsed=null;
+$("prepareSend").disabled=true;
+$("qrDataCard").classList.add("hidden");
+$("qrData").innerHTML="";
+$("preview").removeAttribute("src");$("preview").style.display="none";
+$("fileInput").value="";
+$("msg").className="msg";
+$("diag").textContent="Aguardando leitura.";
+$("secao").value=secaoUrl||"";
+["idue","zona","municipio","apto","comp","falt","validos","brancos","nulos","responsavel","obs"].forEach(id=>{if($(id))$(id).value=""});
+$("origem").value="MANUAL";
+document.querySelectorAll(".vote-input").forEach(i=>i.value="");
+$("balance").textContent="Aptos = Comparecimento + Faltosos";
+}
+
 $("prepareSend").onclick=()=>{
 if(!parsed)return; $("manualScreen").classList.remove("hidden"); $("qrScreen").classList.add("hidden");
 $("tabQr").className="secondary";$("tabManual").className="primary";$("manualScreen").scrollIntoView({behavior:"smooth"});
-msg("Dados do QR preparados. Revise os campos e depois envie o lançamento.","info");
 };
 $("send").onclick=()=>{try{submitPayload()}catch(e){msg(e.message||String(e),"err")}};
 $("tabQr").onclick=()=>{$("qrScreen").classList.remove("hidden");$("manualScreen").classList.add("hidden");$("tabQr").className="primary";$("tabManual").className="secondary"};
 $("tabManual").onclick=()=>{$("qrScreen").classList.add("hidden");$("manualScreen").classList.remove("hidden");$("tabQr").className="secondary";$("tabManual").className="primary"};
-$("start").onclick=startCamera;$("stop").onclick=stopCamera;
-$("fileInput").onchange=async e=>{const file=e.target.files[0];if(!file)return;msg("Para teste por foto, use a câmera/reader externo que já está no GitHub Pages.","info");e.target.value=""};
+$("start").onclick=startCamera;$("stop").onclick=stopCamera;$("clear").onclick=clearAll;
+$("fileInput").onchange=async e=>{const file=e.target.files[0];if(file)await scanPhoto(file);e.target.value=""};
 
 renderCandidates();
 if(secaoUrl)$("secao").value=secaoUrl;
