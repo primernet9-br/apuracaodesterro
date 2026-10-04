@@ -109,8 +109,9 @@ button{border:0;border-radius:10px;padding:12px 15px;font-weight:700;cursor:poin
       <label>Responsável<input id="responsavel" placeholder="Nome do responsável"></label>
     </div>
     <label style="margin-top:10px">Observação<textarea id="obs" placeholder="Observações, se necessário"></textarea></label>
+    <div id="manualMsg" class="msg" style="margin-top:12px"></div>
     <div style="margin-top:12px">
-      <button id="send" class="success">Enviar lançamento</button>
+      <button id="send" type="button" class="success">Enviar lançamento</button>
     </div>
   </div>
 </div>
@@ -375,6 +376,7 @@ function submitPayload(payload){
 }
 
 $("send").onclick=()=>{
+ const manualMsg=$("manualMsg");
  try{
   const secao=$("secao").value.trim(),idue=$("idue").value.trim();
   const apto=Number($("apto").value||0),comp=Number($("comp").value||0),falt=Number($("falt").value||0);
@@ -389,9 +391,17 @@ $("send").onclick=()=>{
    votos:collectVotes()
   };
   if(!payload.votos.length)throw Error("Informe pelo menos um voto.");
+  manualMsg.textContent="Enviando lançamento…";
+  manualMsg.className="msg show info";
   submitPayload(payload);
-  msg("Lançamento enviado para conferência.","ok");
- }catch(e){msg(e.message||String(e),"err")}
+  setTimeout(()=>{
+    manualMsg.textContent="Lançamento enviado para conferência.";
+    manualMsg.className="msg show ok";
+  },300);
+ }catch(e){
+  manualMsg.textContent=e.message||String(e);
+  manualMsg.className="msg show err";
+ }
 };
 
 
