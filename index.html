@@ -55,9 +55,20 @@ button{border:0;border-radius:10px;padding:12px 15px;font-weight:700;cursor:poin
       <button id="stop" class="secondary" style="flex:1">⏹️ Parar câmera</button>
     </div>
 
-    <label style="margin-top:8px">Ou selecione uma foto do QR Code
-      <input id="fileInput" type="file" accept="image/*">
-    </label>
+    <div style="margin-top:14px;padding:12px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px">
+      <div style="font-weight:700;margin-bottom:8px">🖼️ Ou selecione os 2 arquivos do BU</div>
+      <div style="font-size:12px;color:#6b7280;margin-bottom:10px">Selecione o QR Code 1 e o QR Code 2. A leitura só começa depois que os dois arquivos forem escolhidos.</div>
+      <div class="grid">
+        <label>QR Code 1
+          <input id="fileInput1" type="file" accept="image/*">
+        </label>
+        <label>QR Code 2
+          <input id="fileInput2" type="file" accept="image/*">
+        </label>
+      </div>
+      <div id="fileStatus" class="vote-summary">Nenhum dos dois arquivos foi selecionado.</div>
+      <button id="processFiles" type="button" class="primary" style="width:100%;margin-top:8px" disabled>🔎 Iniciar leitura dos 2 QR Codes</button>
+    </div>
 
     <img id="preview" class="preview">
     <div id="msg" class="msg"></div>
@@ -160,7 +171,8 @@ const CANDIDATOS={
  ]
 };
 
-let scanner=null,parts={},parsed=null,qrReady=false,jsQRReady=false;
+let scanner=null,parts={},parsed=null,qrReady=false,jsQRReady=false,qrSubmissionVotes=null;
+let file1=null,file2=null,cameraStage=1;
 const $=id=>document.getElementById(id);
 function msg(t,k){const e=$("msg");e.textContent=t;e.className="msg show "+(k||"");}
 function diag(t){$("diag").textContent=new Date().toLocaleTimeString()+" — "+t;}
@@ -219,7 +231,11 @@ function renderCandidateSections(){
 renderCandidateSections();
 
 function clearAll(){
- stopCamera(); parts={};parsed=null;
+ stopCamera(); parts={};parsed=null;qrSubmissionVotes=null;cameraStage=1;file1=null;file2=null;
+ if($("fileInput1"))$("fileInput1").value="";
+ if($("fileInput2"))$("fileInput2").value="";
+ if($("processFiles"))$("processFiles").disabled=true;
+ if($("fileStatus"))$("fileStatus").textContent="Nenhum dos dois arquivos foi selecionado.";
  document.querySelectorAll("input").forEach(i=>{if(!i.readOnly && i.id!=="fileInput")i.value=""});
   $("candidateSections").querySelectorAll(".vote-input").forEach(i=>i.value="");
  $("candidateSections").querySelectorAll(".otherRows").forEach(i=>i.innerHTML="");
@@ -267,15 +283,43 @@ function onScan(text){
  diag("Texto QR recebido: "+String(text).slice(0,700));
  const normalized=normalizeQRText(text);
  const m=normalized.match(/^QRBU:(\d+):(\d+)/);
- if(!m){msg("QR detectado, mas não reconhecido como QRBU do padrão TSE 2026.","err");return}
+ if(!m){msg("QR detectado, mas não reconhecido como QRBU do padrão TSE 2026.","err");return false}
  const idx=Number(m[1]),total=Number(m[2]);
+ if(total!==2){msg("Este BU informa "+total+" QR Codes. O leitor atual está preparado para 2 QR Codes.","err");return false}
+
+ // No modo câmera, conduzimos a leitura na sequência 1 → 2 para evitar
+ // que o mesmo QR seja capturado repetidamente antes do segundo.
+ if(cameraStage===1 && idx!==1){
+   msg("Este é o QR 2. Primeiro capture o QR 1 do mesmo BU.","err");
+   return false;
+ }
+ if(cameraStage===2 && idx!==2){
+   if(parts[1]) msg("QR 1 já foi capturado. Agora aponte a câmera para o QR 2.","info");
+   return false;
+ }
+ if(parts[idx]){
+   msg("QR "+idx+" já foi capturado. Agora prossiga para o próximo QR.","info");
+   return false;
+ }
+
  parts[idx]=normalized;
- msg("QR "+idx+" de "+total+" lido.","ok");
+ if(idx===1) cameraStage=2;
+ msg("QR "+idx+" de "+total+" lido."+(idx===1?" Agora capture o QR 2.":" Montando o BU completo…"),"ok");
+
  if(Object.keys(parts).length===total){
    const codes=Object.keys(parts).sort((a,b)=>Number(a)-Number(b)).map(k=>parts[k]);
-   try{parsed=parseQRs(codes);fillFromParsed(parsed);stopCamera();msg("Todos os QR Codes foram lidos. Confira os dados antes de enviar.","ok")}
-   catch(e){msg(e.message||String(e),"err");diag("Erro de validação: "+(e.message||e))}
+   try{
+     parsed=parseQRs(codes);
+     fillFromParsed(parsed);
+     stopCamera();
+     msg("Os 2 QR Codes foram lidos e o BU foi montado. Confira os dados antes de enviar.","ok");
+     cameraStage=1;
+   }catch(e){
+     msg(e.message||String(e),"err");
+     diag("Erro de validação: "+(e.message||e));
+   }
  }
+ return true;
 }
 
 function parseQRs(codes){
@@ -296,12 +340,19 @@ function parseQRs(codes){
    if(ordered[i].n!==i+1)throw Error("Falta o QR "+(i+1)+" ou há QR duplicado.");
  }
 
- // Para a leitura normal, cada QR termina em um limite de registro.
- // Quando houver quebra entre QRs, o separador lógico é restaurado.
+ // Reconstrói o BU na ordem dos QR Codes. Normalmente cada QR termina em
+ // um limite de registro. O padrão TSE também admite que um registro seja
+ // dividido entre dois QR Codes sem espaço; nesse caso recompomos o token.
  let content="";
  ordered.forEach((q,i)=>{
-   const body=q.text.replace(/^QRBU:\d+:\d+\s*/i,"");
-   content += (i?" ":"")+body.trim();
+   const body=q.text.replace(/^QRBU:\d+:\d+\s*/i,"").trim();
+   if(!i){ content=body; return; }
+   const prevToken=(content.match(/\S+$/)||[""])[0];
+   const nextToken=(body.match(/^\S+/)||[""])[0];
+   const fragmentLikely =
+     /:$/.test(prevToken) ||
+     (!prevToken.includes(":") && /^[A-Za-z0-9]+$/.test(prevToken) && /^[A-Za-z0-9]/.test(nextToken) && prevToken.length < 12);
+   content += (fragmentLikely ? "" : " ") + body;
  });
  content=normalizeQRText(content);
 
@@ -380,8 +431,17 @@ function parseQRs(codes){
    throw Error("QR indica seção "+p.secao+"; este link é da seção "+secaoUrl+".");
  }
 
- // Válidos: soma dos votos nominais + legendas encontrados no QR.
- p.validos=p.votos.reduce((s,v)=>s+Number(v.votos||0),0);
+ // O BU 2026 apresenta NOMI/LEGC/BRAN/NULO/TOTC por cargo. Para os campos
+ // gerais desta tela, usamos a Presidência como referência, pois ela tem
+ // uma votação por eleitor e fecha diretamente com o comparecimento.
+ const pres=p.cargos.find(c=>c.codigo===1);
+ if(pres){
+   p.validos=Number(pres.resumo.NOMI||0)+Number(pres.resumo.LEGC||0);
+   p.brancos=Number(pres.resumo.BRAN||0);
+   p.nulos=Number(pres.resumo.NULO||0);
+ }else{
+   p.validos=0; p.brancos=0; p.nulos=0;
+ }
 
  for(const v of p.votos){
    if(v.tipo==="LEGENDA")continue;
@@ -392,6 +452,7 @@ function parseQRs(codes){
 }
 
 function fillFromParsed(p){
+ qrSubmissionVotes=(p.votos||[]).map(v=>({...v}));
  const opt=[...$("secao").options].find(o=>o.value===String(p.secao));
  if(opt){$("secao").value=String(p.secao);}else{$("secao").value=p.secao||$("secao").value;}
  $("idue").value=p.idue||"";
@@ -447,15 +508,101 @@ function fillFromParsed(p){
 
 async function startCamera(){
  if(!qrReady||!window.Html5Qrcode){msg("Leitor de câmera ainda está carregando.","err");return}
- stopCamera(); parts={};
+ await stopCamera();
+ parts={};parsed=null;cameraStage=1;
+ msg("Aponte a câmera para o QR 1 de 2 do BU.","info");
+ diag("Aguardando QR 1 de 2…");
  scanner=new Html5Qrcode("reader");
  try{
-  await scanner.start({facingMode:"environment"},{fps:10,qrbox:{width:280,height:280}},text=>onScan(text),()=>{});
-  msg("Câmera iniciada. Aponte para o QR do BU.","ok");
+  await scanner.start({facingMode:"environment"},{fps:8,qrbox:{width:280,height:280}},text=>onScan(text),()=>{});
+  msg("Câmera iniciada. Primeiro capture o QR 1; depois o QR 2.","ok");
  }catch(e){msg("Não foi possível iniciar a câmera: "+e,"err");}
 }
 async function stopCamera(){
  if(scanner){try{await scanner.stop();}catch(e){}try{scanner.clear();}catch(e){}scanner=null}
+}
+
+function updateFileStatus(){
+ const status=$("fileStatus");
+ const n=(file1?1:0)+(file2?1:0);
+ if(n===0) status.textContent="Nenhum dos dois arquivos foi selecionado.";
+ else if(n===1) status.textContent=(file1?"QR 1 selecionado.":"QR 2 selecionado.")+" Selecione o outro arquivo para iniciar a leitura.";
+ else status.textContent="QR 1 e QR 2 selecionados. Pronto para iniciar a leitura.";
+ $("processFiles").disabled=n!==2;
+}
+
+async function decodeImageFile(file){
+ if(!file) throw Error("Arquivo de imagem não informado.");
+ // Primeiro usa html5-qrcode para arquivo.
+ if(qrReady && window.Html5Qrcode){
+   let temp=null;
+   try{
+     temp=new Html5Qrcode("reader");
+     const text=await temp.scanFile(file,true);
+     try{await temp.clear();}catch(e){}
+     return text;
+   }catch(e){
+     try{if(temp)await temp.clear();}catch(_){ }
+   }
+ }
+ // Fallback com jsQR e variantes de imagem.
+ if(jsQRReady && window.jsQR){
+   return await new Promise((resolve,reject)=>{
+     const reader=new FileReader();
+     reader.onload=()=>{
+       const img=new Image();
+       img.onload=()=>{
+         try{
+           $("preview").src=reader.result;
+           $("preview").style.display="block";
+           const variants=canvasVariants(img);
+           for(const v of variants){
+             const ctx=v.canvas.getContext("2d",{willReadFrequently:true});
+             const data=ctx.getImageData(0,0,v.canvas.width,v.canvas.height);
+             const code=window.jsQR(data.data,data.width,data.height,{inversionAttempts:"attemptBoth"});
+             if(code&&code.data){resolve(code.data);return;}
+           }
+           reject(Error("Não foi possível decodificar este QR Code."));
+         }catch(e){reject(e)}
+       };
+       img.onerror=()=>reject(Error("Não consegui abrir a imagem."));
+       img.src=reader.result;
+     };
+     reader.onerror=()=>reject(Error("Não consegui ler o arquivo de imagem."));
+     reader.readAsDataURL(file);
+   });
+ }
+ throw Error("Os leitores de QR ainda estão carregando. Aguarde alguns segundos.");
+}
+
+async function processSelectedFiles(){
+ if(!file1||!file2){msg("Selecione os dois arquivos do BU antes de iniciar a leitura.","err");return}
+ await stopCamera();
+ parts={};parsed=null;cameraStage=1;
+ $("processFiles").disabled=true;
+ msg("Lendo o arquivo do QR 1…","info");
+ try{
+   const t1=await decodeImageFile(file1);
+   const n1=normalizeQRText(t1),m1=n1.match(/^QRBU:(\d+):(\d+)/);
+   if(!m1)throw Error("O arquivo indicado como QR 1 não contém um QRBU válido do TSE 2026.");
+   if(Number(m1[1])!==1 || Number(m1[2])!==2)throw Error("O primeiro arquivo não é o QR 1 de 2 do BU.");
+   parts[1]=n1;
+   msg("QR 1 lido. Agora lendo o arquivo do QR 2…","ok");
+   const t2=await decodeImageFile(file2);
+   const n2=normalizeQRText(t2),m2=n2.match(/^QRBU:(\d+):(\d+)/);
+   if(!m2)throw Error("O arquivo indicado como QR 2 não contém um QRBU válido do TSE 2026.");
+   if(Number(m2[1])!==2 || Number(m2[2])!==2)throw Error("O segundo arquivo não é o QR 2 de 2 do BU.");
+   parts[2]=n2;
+   parsed=parseQRs([parts[1],parts[2]]);
+   fillFromParsed(parsed);
+   msg("Os 2 arquivos foram lidos e o BU foi montado. Confira os dados antes de enviar.","ok");
+ }catch(e){
+   parts={};
+   msg(e.message||String(e),"err");
+   diag("Erro na leitura dos arquivos: "+(e.message||e));
+ }finally{
+   updateFileStatus();
+ }
 }
 
 function canvasVariants(img){
@@ -480,66 +627,6 @@ function canvasVariants(img){
  return list;
 }
 
-async function scanPhoto(file){
- if(!file)return;
- msg("Processando a foto do QR Code…","info");
- diag("Abrindo foto: "+file.name);
-
- // Primeiro usa o leitor html5-qrcode, que possui suporte próprio para
- // arquivos de imagem e costuma funcionar melhor que decodificar o canvas manualmente.
- if(qrReady && window.Html5Qrcode){
-   try{
-     if(scanner){await stopCamera();}
-     scanner=new Html5Qrcode("reader");
-     const text=await scanner.scanFile(file,true);
-     diag("QR encontrado na foto.");
-     onScan(text);
-     try{await scanner.clear();}catch(e){}
-     scanner=null;
-     return;
-   }catch(e){
-     try{if(scanner){await scanner.clear();}}catch(_){}
-     scanner=null;
-     diag("html5-qrcode não decodificou; tentando leitor alternativo.");
-   }
- }
-
- // Fallback com jsQR.
- if(jsQRReady && window.jsQR){
-   const reader=new FileReader();
-   reader.onload=()=>{
-     const img=new Image();
-     img.onload=()=>{
-       try{
-         $("preview").src=reader.result;
-         $("preview").style.display="block";
-         const variants=canvasVariants(img);
-         for(const v of variants){
-           const ctx=v.canvas.getContext("2d",{willReadFrequently:true});
-           const data=ctx.getImageData(0,0,v.canvas.width,v.canvas.height);
-           const code=window.jsQR(data.data,data.width,data.height,{inversionAttempts:"attemptBoth"});
-           if(code&&code.data){
-             diag("QR encontrado pelo leitor alternativo.");
-             onScan(code.data);
-             return;
-           }
-         }
-         msg("A foto foi aberta, mas o QR não foi decodificado. Tente uma foto mais próxima e sem reflexos.","err");
-       }catch(e){
-         msg("Erro ao processar a foto: "+(e.message||e),"err");
-         diag("Erro ao processar foto: "+(e.stack||e));
-       }
-     };
-     img.onerror=()=>msg("Não consegui abrir a foto selecionada.","err");
-     img.src=reader.result;
-   };
-   reader.onerror=()=>msg("Não consegui ler o arquivo de imagem.","err");
-   reader.readAsDataURL(file);
-   return;
- }
-
- msg("Os leitores de QR ainda estão carregando. Aguarde alguns segundos e selecione a foto novamente.","err");
-}
 
 function collectVotes(){
  const votos=[];
@@ -580,7 +667,7 @@ $("send").onclick=()=>{
    nulos:Number($("nulos").value||0), origem:$("origem").value,
    observacao:$("obs").value.trim(),
    responsavel:$("responsavel").value.trim(),
-   votos:collectVotes()
+   votos:(($("origem").value==="QR" && qrSubmissionVotes) ? qrSubmissionVotes : collectVotes())
   };
   if(!payload.votos.length)throw Error("Informe pelo menos um voto.");
   manualMsg.textContent="Enviando lançamento…";
@@ -615,14 +702,19 @@ $("tabManual").onclick=()=>{
 
 $("start").onclick=startCamera;
 $("stop").onclick=stopCamera;
-$("fileInput").addEventListener("change",async e=>{
- const file=e.target.files && e.target.files[0];
- if(!file)return;
- diag("Arquivo selecionado: "+file.name);
- await scanPhoto(file);
+$("fileInput1").addEventListener("change",e=>{
+ file1=e.target.files && e.target.files[0] ? e.target.files[0] : null;
+ updateFileStatus();
+ if(file1)diag("QR 1 selecionado: "+file1.name);
 });
+$("fileInput2").addEventListener("change",e=>{
+ file2=e.target.files && e.target.files[0] ? e.target.files[0] : null;
+ updateFileStatus();
+ if(file2)diag("QR 2 selecionado: "+file2.name);
+});
+$("processFiles").onclick=processSelectedFiles;
 
-
+updateFileStatus();
 updateBalance();
 diag("Sistema carregado.");
 })();
