@@ -179,7 +179,7 @@ const CANDIDATOS={
  "PRESIDENTE":[{numero:"13",nome:"Lula"},{numero:"22",nome:"Flávio Bolsonaro"}]
 };
 
-let scanner=null,parts={},parsed=null,qrReady=false,jsQRReady=false,qrSubmissionVotes=null;
+let scanner=null, cameraStream=null, cameraVideo=null, cameraCanvas=null, cameraRaf=0, scanBusy=false, parts={},parsed=null,qrReady=false,jsQRReady=false,qrSubmissionVotes=null;
 let file1=null,file2=null,cameraStage=1;
 const $=id=>document.getElementById(id);
 function msg(t,k){const e=$("msg");e.textContent=t;e.className="msg show "+(k||"");}
@@ -346,47 +346,74 @@ function fillFromParsed(p){
 }
 
 async function startCamera(){
- if(!qrReady||!window.Html5Qrcode){msg("Leitor de câmera ainda está carregando.","err");return;}
- await stopCamera();parts={};parsed=null;cameraStage=1;
- msg("Aponte a câmera para o QR Code do Boletim de Urna.","info");diag("Aguardando o primeiro QR Code…");
- scanner=new Html5Qrcode("reader");
+ if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+   msg("Este navegador não permite acesso à câmera. Use a seleção de imagem.","err");return;
+ }
+ if(!jsQRReady || !window.jsQR){
+   msg("O decodificador da câmera ainda está carregando. Aguarde alguns segundos e tente novamente.","err");return;
+ }
+ await stopCamera();
+ parts={};parsed=null;cameraStage=1;scanBusy=false;
+ const reader=$("reader");
+ reader.innerHTML="";
+ cameraVideo=document.createElement("video");
+ cameraVideo.setAttribute("playsinline","true");
+ cameraVideo.setAttribute("autoplay","true");
+ cameraVideo.muted=true;
+ cameraVideo.style.cssText="display:block;width:100%;height:auto;max-height:520px;object-fit:contain;border-radius:10px;background:#111827";
+ cameraCanvas=document.createElement("canvas");
+ cameraCanvas.style.display="none";
+ reader.appendChild(cameraVideo);reader.appendChild(cameraCanvas);
+ msg("Aponte a câmera para o QR Code inteiro, incluindo os quatro cantos.","info");
+ diag("Iniciando câmera e decodificador alternativo…");
  try{
-   await scanner.start({facingMode:"environment"},{fps:10,qrbox:{width:320,height:320}},text=>onScan(text),()=>{});
-   msg("Câmera iniciada. O leitor identificará quantos QR Codes existem no boletim.","ok");
- }catch(e){msg("Não foi possível iniciar a câmera: "+e,"err");}
+   cameraStream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:"environment"},width:{ideal:1920},height:{ideal:1080}}});
+   cameraVideo.srcObject=cameraStream;
+   await cameraVideo.play();
+   msg("Câmera iniciada. Tentando decodificar o QR Code…","ok");
+   diag("Câmera ativa; analisando imagem continuamente.");
+   scanCameraFrame();
+ }catch(e){
+   await stopCamera();
+   msg("Não foi possível iniciar a câmera: "+(e.message||e),"err");
+ }
+}
+function scanCameraFrame(){
+ if(!cameraVideo || !cameraStream || cameraVideo.readyState<2){cameraRaf=requestAnimationFrame(scanCameraFrame);return;}
+ if(scanBusy){cameraRaf=requestAnimationFrame(scanCameraFrame);return;}
+ scanBusy=true;
+ try{
+   const vw=cameraVideo.videoWidth,vh=cameraVideo.videoHeight;
+   if(vw&&vh){
+     cameraCanvas.width=vw;cameraCanvas.height=vh;
+     const ctx=cameraCanvas.getContext("2d",{willReadFrequently:true});
+     ctx.drawImage(cameraVideo,0,0,vw,vh);
+     let image=ctx.getImageData(0,0,vw,vh);
+     let code=window.jsQR(image.data,image.width,image.height,{inversionAttempts:"attemptBoth"});
+     if(!code){
+       // Segunda tentativa com contraste em escala de cinza para códigos fotografados.
+       const d=image.data;
+       for(let i=0;i<d.length;i+=4){const y=.299*d[i]+.587*d[i+1]+.114*d[i+2];const v=Math.max(0,Math.min(255,(y-128)*1.5+128));d[i]=d[i+1]=d[i+2]=v;}
+       code=window.jsQR(d,image.width,image.height,{inversionAttempts:"attemptBoth"});
+     }
+     if(code&&code.data){
+       const keepGoing=onScan(code.data);
+       if(!keepGoing && cameraStream){
+         // QR inválido/duplicado: segue tentando sem encerrar a câmera.
+       }
+       if(parsed){scanBusy=false;return;}
+     }
+   }
+ }catch(e){diag("Tentativa de leitura: "+(e.message||e));}
+ scanBusy=false;
+ if(cameraStream)cameraRaf=requestAnimationFrame(scanCameraFrame);
 }
 async function stopCamera(){
+ if(cameraRaf){cancelAnimationFrame(cameraRaf);cameraRaf=0;}
+ if(cameraStream){cameraStream.getTracks().forEach(t=>{try{t.stop();}catch(e){}});cameraStream=null;}
+ if(cameraVideo){try{cameraVideo.pause();cameraVideo.srcObject=null;}catch(e){}cameraVideo=null;}
+ cameraCanvas=null;scanBusy=false;
  if(scanner){try{await scanner.stop();}catch(e){}try{scanner.clear();}catch(e){}scanner=null;}
-}
-
-async function processSelectedFiles(){
- const files=[file1,file2].filter(Boolean);
- if(!files.length){msg("Selecione pelo menos uma imagem do QR Code.","err");return;}
- await stopCamera();parts={};parsed=null;$('processFiles').disabled=true;
- try{
-   const decoded=[];
-   for(let i=0;i<files.length;i++){
-     msg("Lendo imagem "+(i+1)+" de "+files.length+"…","info");
-     const text=normalizeQRText(await decodeImageFile(files[i]));
-     const m=text.match(/^QRBU:(\d+):(\d+)/);
-     if(!m)throw Error("Uma imagem não contém um QRBU válido.");
-     decoded.push({idx:Number(m[1]),total:Number(m[2]),text});
-   }
-   const total=decoded[0].total;
-   if(decoded.some(q=>q.total!==total))throw Error("As imagens indicam quantidades diferentes de QR Codes.");
-   if(total<1||total>2)throw Error("Este leitor aceita boletins com 1 ou 2 QR Codes.");
-   if(decoded.length!==total)throw Error("Este boletim informa "+total+" QR Code(s). Selecione "+total+" imagem(ns).");
-   decoded.forEach(q=>{
-     if(q.idx<1||q.idx>total)throw Error("Índice de QR Code inválido.");
-     if(parts[q.idx])throw Error("O QR "+q.idx+" foi selecionado mais de uma vez.");
-     parts[q.idx]=q.text;
-   });
-   const codes=Array.from({length:total},(_,i)=>parts[i+1]);
-   if(codes.some(c=>!c))throw Error("Falta um QR Code da sequência.");
-   parsed=parseQRs(codes);fillFromParsed(parsed);
-   msg(total===1?"QR Code único lido. Confira os dados antes de enviar.":"Os 2 QR Codes foram lidos. Confira os dados antes de enviar.","ok");
- }catch(e){parts={};msg(e.message||String(e),"err");diag("Erro na leitura: "+(e.message||e));}
- finally{updateFileStatus();}
 }
 
 function updateFileStatus(){
